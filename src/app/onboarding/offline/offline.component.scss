@@ -1,0 +1,17 @@
+.background {
+  background-image: url('../../../assets/images/background3.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100vh;
+
+  .notification {
+    margin: 15vh 1.5rem;
+
+    button {
+      font-size: .7rem;
+      letter-spacing: .02rem;
+    }
+  }
+}

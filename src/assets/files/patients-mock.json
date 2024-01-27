@@ -1,0 +1,250 @@
+[
+  {
+    "firstName": "Zsolt",
+    "lastName": "Keresztes",
+    "phone": "+40755753463",
+    "PIN": "5000212142381",
+    "birthdate": "2000-02-12",
+    "age": "23",
+    "sex": "Male",
+    "email": "keryzsoly@yahoo.com",
+    "county": "Harghita",
+    "town": "Miercurea-Ciuc",
+    "address": "Str. Jigodin, nr. 1",
+    "allergies": [],
+    "previousSurgeries": [
+      "Appendectomy - 2009"
+    ],
+    "chronicDiseases": [],
+    "familyHealthHistory": [
+      "Heart disease",
+      "Parkinson's"
+    ],
+    "toothChart": [
+      {
+        "id": 2,
+        "status": "intact",
+        "previousCares": [
+          {
+            "treatment": "Tooth filling",
+            "date": "2015-03-07",
+            "description": "Tooth decay",
+            "positionX": "52",
+            "positionY": "22.5"
+          },
+          {
+            "treatment": "Root Canal Treatment",
+            "date": "2021-06-11",
+            "description": "Necessary root canal treatment due to severe pain caused by years of decay",
+            "positionX": "50",
+            "positionY": "80"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "status": "intact",
+        "previousCares": [
+          {
+            "treatment": "Tooth filling",
+            "date": "2023-08-30",
+            "description": "Tooth decay right between 2.4 and 2.5",
+            "positionX": "50",
+            "positionY": "22.5"
+          },
+          {
+            "treatment": "Root Canal Treatment",
+            "date": "2023-12-15",
+            "description": "Removed previous filling, as pain persisted. Found decayed residue from last filling which caused further pain. Removed nerves, cleaned out, installed temporary filling.",
+            "positionX": "52",
+            "positionY": "35"
+          },
+          {
+            "treatment": "Tooth filling after root canal",
+            "date": "2023-12-19",
+            "description": "Removed temporary filling from last visit on 2023.12.15, after root canal treatment. Cleaned the chambers again with chlorine, installed permanent filling.",
+            "positionX": "50",
+            "positionY": "80"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "status": "intact",
+        "previousCares": [
+          {
+            "treatment": "Gum line cleaning",
+            "date": "2023-12-13",
+            "description": "Due to debris, the gum line is infected, and it caused some pain. Recommended fluoride mouthwash and letting it heal on its own.",
+            "positionX": "52",
+            "positionY": "35"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "status": "missing",
+        "previousCares": []
+      },
+      {
+        "id": 32,
+        "status": "missing",
+        "previousCares": []
+      }
+    ]
+  },
+  {
+    "firstName": "David",
+    "lastName": "Smith",
+    "phone": "+9876543210",
+    "PIN": "5000212142381",
+    "birthdate": "1990-03-25",
+    "age": "32",
+    "sex": "Male",
+    "email": "david.smith@example.com",
+    "county": "Othertown County",
+    "town": "Othertown",
+    "address": "456 Oak Avenue",
+    "allergies": [],
+    "previousSurgeries": [],
+    "chronicDiseases": [],
+    "familyHealthHistory": [],
+    "toothChart": [
+      {
+        "id": 2,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 3,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 4,
+        "status": "intact",
+        "previousCares": []
+      }
+    ]
+  },
+  {
+    "firstName": "Emma",
+    "lastName": "Brown",
+    "phone": "+1112223333",
+    "PIN": "5000212142381",
+    "birthdate": "1978-11-05",
+    "age": "45",
+    "sex": "Female",
+    "email": "emma.b@example.com",
+    "county": "Another County",
+    "town": "Another Town",
+    "address": "789 Elm Street",
+    "allergies": [],
+    "previousSurgeries": [],
+    "chronicDiseases": [],
+    "familyHealthHistory": [
+      "Cancer"
+    ],
+    "toothChart": [
+      {
+        "id": 2,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 3,
+        "status": "missing",
+        "previousCares": []
+      },
+      {
+        "id": 13,
+        "status": "implant",
+        "previousCares": [
+          {
+            "treatment": "Implant",
+            "date": "2021-05-15",
+            "description": "Due to broken tooth, tooth was completely removed and an implant installed.",
+            "positionX": "1000",
+            "positionY": "350"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "firstName": "Michael",
+    "lastName": "Williams",
+    "phone": "+4445556666",
+    "PIN": "5000212142381",
+    "birthdate": "1980-09-18",
+    "age": "42",
+    "sex": "Male",
+    "email": "michael.w@example.com",
+    "county": "Some County",
+    "town": "Sometown",
+    "address": "567 Maple Lane",
+    "allergies": [],
+    "previousSurgeries": [
+      "Knee surgery - 2015"
+    ],
+    "chronicDiseases": [
+      "Diabetes"
+    ],
+    "familyHealthHistory": [
+      "Hypertension"
+    ],
+    "toothChart": [
+      {
+        "id": 2,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 3,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 4,
+        "status": "intact",
+        "previousCares": []
+      }
+    ]
+  },
+  {
+    "firstName": "Sophia",
+    "lastName": "Garcia",
+    "phone": "+7778889999",
+    "PIN": "5000212142381",
+    "birthdate": "1995-12-30",
+    "age": "27",
+    "sex": "Female",
+    "email": "sophia.g@example.com",
+    "county": "New County",
+    "town": "Newtown",
+    "address": "890 Cedar Street",
+    "allergies": [
+      "Nuts"
+    ],
+    "previousSurgeries": [],
+    "chronicDiseases": [],
+    "familyHealthHistory": [],
+    "toothChart": [
+      {
+        "id": 1,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 2,
+        "status": "intact",
+        "previousCares": []
+      },
+      {
+        "id": 3,
+        "status": "intact",
+        "previousCares": []
+      }
+    ]
+  }
+]

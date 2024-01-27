@@ -1,0 +1,62 @@
+<div class="relative overflow-hidden w-full flex justify-content-center" #parentContainer>
+  <div>
+    <h1 class="text-white-alpha-80 text-center">{{ toothNotation[toothIndex] ? toothNotation[toothIndex].label : '' }}</h1>
+    <!--  Add tooth name (like molar, premolar, incisor, etc)-->
+    <img (dblclick)="addPreviousCare($event)"
+         (touchstart)="onTouchStart($event)"
+         class="w-18rem sm:w-20rem md:w-25rem lg:w-30rem" src="assets/images/tooth-molar.png">
+    <div *ngIf="patientToothChart[toothIndex]">
+      <div #previousCareLabel *ngFor="let previousCare of patientToothChart[toothIndex].previousCares; index as previousCareIndex"
+           cdkDrag
+           (cdkDragEnded)="dragEndedPreviousCare($event, previousCareIndex)"
+           [cdkDragBoundary]="parentContainer"
+           class="absolute flex line">
+        <div class="hidden sm:block w-5rem md:w-8rem lg:w-14rem border-bottom-1 mt-1"></div>
+        <div
+          (click)="displayPreviousCareDialog(previousCareIndex)"
+          class="label max-w-17rem border-bottom-1 p-1 sm:p-2
+            border-round-top text-xs lg:text-base transition-duration-200 cursor-pointer">
+          <span class="text-white-alpha-90">{{previousCare.treatment}}</span>
+          <span *ngIf="previousCare.treatment.length && previousCare.date" class="text-white-alpha-70">: {{previousCare.date | date : 'YYYY-MM-dd'}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex my-4 justify-content-center">
+      <button pRipple (click)="closeToothDialog()" class="p-button font-medium">Close</button>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closeOnEscape]="true"
+          class="previous-care-dialog"
+          (keydown.control.enter)="closeDialogAndSavePreviousCare()"
+          [(visible)]="showPreviousCareDialog">
+  <p class="m-1 text-sm text-white-alpha-70 w-75vw sm:w-20rem">Treatment:</p>
+  <input (keyup.enter)="focusNextInput(dateInput)" #treatmentInput pInputText [(ngModel)]="previousCareToShow.treatment"/>
+  <p class="m-1 pt-1 text-sm text-white-alpha-70">Date:</p>
+  <div>
+    <p-calendar
+      #dateInput
+      (keyup.enter)="focusNextInput(descriptionInput)"
+      [dateFormat]="'yy/mm/dd'"
+      [(ngModel)]="previousCareToShow.date">
+    </p-calendar>
+  </div>
+  <p class="m-1 pt-1 text-sm text-white-alpha-70">Description:</p>
+  <textarea #descriptionInput pInputTextarea [(ngModel)]="previousCareToShow.description"></textarea>
+  <div class="flex gap-2 justify-content-end mt-2">
+    <button pRipple type="button" (click)="cancelPreviousCareDialog()" class="p-button cancel">Cancel</button>
+    <button pRipple
+            type="button"
+            [disabled]="!previousCareToShow.treatment"
+            (click)="closeDialogAndSavePreviousCare()"
+            class="p-button">Save
+    </button>
+  </div>
+</p-dialog>

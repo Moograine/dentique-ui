@@ -1,0 +1,36 @@
+@import 'src/assets/styles/custom';
+
+:host::ng-deep {
+  .line {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: opacity .25s ease;
+    opacity: 0;
+
+    .label {
+      min-width: 8rem;
+      min-height: 1.75rem;
+
+      @media(min-width: 992px) {
+        min-height: 2.25rem;
+      }
+    }
+  }
+
+  .previous-care-dialog {
+    .p-dialog {
+      width: auto;
+      height: auto;
+
+      &-content {
+        background: $input-primary;
+        display: block;
+      }
+    }
+  }
+
+  .w-75vw {
+    width: 75vw;
+  }
+}

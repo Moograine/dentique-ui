@@ -1,0 +1,32 @@
+<div class="background flex justify-content-center align-items-center">
+  <form class="flex flex-column w-20rem mb-5" [formGroup]="loginForm">
+    <span class="p-input-icon-left">
+      <i
+        class="pi pi-user transition-colors transition-duration-1000"
+        [class.text-white-alpha-80]="loginForm.value.username"></i>
+      <input
+        type="text"
+        class="p-inputtext-lg w-full text-white-alpha-80"
+        pInputText
+        formControlName="username"
+        [placeholder]="'Username'"/>
+    </span>
+    <span class="p-input-icon-left relative my-3">
+        <i class="pi pi-lock absolute transition-all transition-duration-300"
+           [class.opacity-0]="loginForm.value.password"></i>
+        <i class="pi opacity-0 absolute ml-2 pl-1 hover:text-white
+         transition-all transition-duration-300 text-white-alpha-80"
+           [class]="showPassword ? 'pi-eye-slash' : 'pi-eye'"
+           [class.opacity-100]="loginForm.value.password"
+           (click)="toggleShowPassword(passwordInput)"></i>
+      <input
+        type="password"
+        #passwordInput
+        class="p-inputtext-lg w-full text-white-alpha-80"
+        pInputText
+        formControlName="password"
+        [placeholder]="'Password'"/>
+    </span>
+    <button pRipple (click)="login()" pButton class="p-button-lg default">Login</button>
+  </form>
+</div>

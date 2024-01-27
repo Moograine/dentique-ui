@@ -1,0 +1,103 @@
+<div class="h-5rem border-white-alpha-10 border-bottom-1 mx-3"></div>
+
+<div class="mt-1 p-2 sm:p-3 appointment-container overflow-auto relative">
+  <div *ngFor="let date of appointments | keyvalue">
+    <p class="m-0 font-bold text-white-alpha-80">{{date.key}}</p>
+    <div
+      *ngFor="let appointment of date.value; index as index"
+      class="scalein card shadow-2 animation-duration-200 mx-2 my-3 sm:m-3 p-3 sm:p-4 border-round-xl text-white-alpha-70">
+      <div class="flex justify-content-between align-items-center">
+        <div class="text-sm sm:text-base">
+          <div class="flex">
+            <i class="pi pi-user"></i>
+            <h4 class="mx-1 my-0">Patient: </h4>
+            <p (click)="navigateToPatient(appointment['firstName'] + appointment['lastName'])"
+               class="my-0 hover:text-white-alpha-90 cursor-pointer">{{appointment['firstName']}} {{appointment['lastName']}}</p>
+          </div>
+          <div class="flex pt-1">
+            <i class="pi pi-calendar"></i>
+            <h4 class="mx-1 my-0">Date: </h4>
+            <p class="my-0">{{appointment['date'] | date : 'h:mm, EEEE'}}</p>
+          </div>
+          <div class="flex pt-1">
+            <i class="pi pi-home"></i>
+            <h4 class="mx-1 my-0">Cabinet: </h4>
+            <p class="my-0">{{appointment['cabinetNumber']}}</p>
+          </div>
+          <div class="flex pt-1">
+            <i class="pi pi-heart"></i>
+            <h4 class="mx-1 my-0">Treatment: </h4>
+            <p class="my-0">{{appointment['description']}}</p>
+          </div>
+        </div>
+        <div class="flex flex-column sm:flex-row justify-content-center align-items-center gap-2">
+          <button pRipple class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-green-900 hover:bg-green-800">
+            <i class="pi pi-check text-sm md:text-xl text-white-alpha-80"></i>
+          </button>
+          <button pRipple (click)="deleteAppointment(date.key, index)" class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-red-800 hover:bg-red-700">
+            <i class="pi pi-trash text-sm md:text-xl text-white-alpha-80"></i>
+          </button>
+          <button pRipple (click)="displayUpdateAppointmentDialog(date.key, index, appointment)" class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-gray-700 hover:bg-gray-600">
+            <i class="pi pi-cog text-sm md:text-xl text-white-alpha-80"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  <i class="pi pi-plus-circle text-5xl text-green-700 transition-duration-200 hover:text-green-600 cursor-pointer fixed mr-4 mb-5 bottom-0 right-0"-->
+  <!--     (click)="displayAddAppointmentDialog()">-->
+  <!--  </i>-->
+  <button
+    pRipple
+    (click)="displayAddAppointmentDialog()"
+    class="p-button bg-green-900 hover:bg-green-800 fixed mr-4 mb-5 bottom-0
+    right-0 border-round-3xl flex justify-content-center w-3rem h-3rem shadow-8 text-bluegray-300 hover:text-bluegray-100">
+    <i class="pi pi-user-plus text-2xl"></i>
+  </button>
+</div>
+
+<p-toast></p-toast>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closeOnEscape]="true"
+          (onHide)="onDialogClose()"
+          [(visible)]="showAppointmentDialog">
+  <form (keydown.control.shift.enter)="editedAppointmentIndex < 0 ? saveAppointment() : updateAppointment()" [formGroup]="appointmentFormGroup">
+    <div class="grid grid-nogutter w-75vw sm:w-22rem">
+      <div class="col-6 pr-1">
+        <p class="m-1 text-sm text-white-alpha-70">Name:</p>
+        <input (keyup.enter)="focusNextInput(lastNameInput)" pInputText formControlName="firstName"/>
+      </div>
+      <div class="col-6 pl-1">
+        <p class="m-1 text-sm text-white-alpha-70">Family Name:</p>
+        <input (keyup.enter)="focusNextInput(phoneInput)" #lastNameInput pInputText formControlName="lastName"/>
+      </div>
+    </div>
+    <p class="m-1 text-sm text-white-alpha-70">Phone:</p>
+    <input (keyup.enter)="focusNextInput(dateInput)" #phoneInput pInputText formControlName="phone"/>
+    <p class="m-1 pt-1 text-sm text-white-alpha-70">Date:</p>
+    <div class="calendar">
+      <p-calendar
+        #dateInput
+        [minDate]="today"
+        [dateFormat]="'yy/mm/dd'"
+        (keyup.enter)="focusNextInput(descriptionInput)"
+        formControlName="date">
+      </p-calendar>
+    </div>
+    <p class="m-1 pt-1 text-sm text-white-alpha-70">Description:</p>
+    <textarea #descriptionInput pInputTextarea formControlName="description"></textarea>
+    <div class="flex gap-2 justify-content-end mt-2">
+      <button pRipple type="button" (click)="closeAppointmentDialog()" class="p-button cancel">Cancel</button>
+      <button pRipple
+              type="button"
+              [disabled]="!appointmentFormGroup.value.date"
+              (click)="editedAppointmentIndex < 0 ? saveAppointment() : updateAppointment()"
+              class="p-button">Save
+      </button>
+    </div>
+  </form>
+</p-dialog>

@@ -1,0 +1,17 @@
+@import './variables';
+
+::-webkit-scrollbar {
+  width: .5rem;
+
+  &-track {
+    background: $scroll-background;
+  }
+
+  &-thumb {
+    background: $scroll-thumbnail;
+
+    &:hover {
+      background: $scroll-thumbnail-hover;
+    }
+  }
+}

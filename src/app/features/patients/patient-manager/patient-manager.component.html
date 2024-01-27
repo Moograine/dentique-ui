@@ -1,0 +1,342 @@
+<div class="h-5rem border-white-alpha-10 border-bottom-1 mx-3">
+</div>
+
+<form [formGroup]="patientFormGroup"
+      (keydown.control.shift.enter)="savePatient()"
+      class="p-2 md:p-3 manager-container overflow-auto text-white-alpha-80">
+  <!--  Main Container-->
+  <div class="grid flex-column md:flex-row">
+    <!--    1st Column-->
+    <div class="col">
+      <!-- 1st Block-->
+      <div class="grid grid-nogutter">
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="firstName">Name</label>
+            <input
+              autocomplete="off"
+              #firstNameInput
+              id="firstName"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="firstName"
+              [placeholder]="'John'"
+              (keyup.enter)="focusNextInput(lastNameInput)"
+            />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="lastName">Family Name</label>
+            <input
+              autocomplete="off"
+              #lastNameInput
+              id="lastName"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="lastName"
+              [placeholder]="'Doe'"
+              (keyup.enter)="focusNextInput(phoneInput)"
+            />
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="phone">Phone Number</label>
+            <input
+              autocomplete="off"
+              #phoneInput
+              id="phone"
+              class="p-inputtext-lg mt-1 w-full"
+              pInputText
+              formControlName="phone"
+              [placeholder]="'+40712345678'"
+              (keyup.enter)="focusNextInput(PINInput)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- 2nd Block-->
+      <div class="grid grid-nogutter">
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="PIN">CNP</label>
+            <input
+              autocomplete="off"
+              #PINInput
+              id="PIN"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="PIN"
+              [placeholder]="'5001212121234'"
+              (ngModelChange)="calculateBirthday(PINInput.value)"
+              (keyup.enter)="filterNextInput(emailInput)"
+            />
+          </div>
+        </div>
+        <!--  You actually don't need the birthdate, you can calculate it from the romanian CNP, the age as well and gender -->
+        <div class="col-4">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="birthdate">Date of Birth</label>
+            <!--            (ngModelChange)="focusNextInput(ageInput)"            ** behaviour issue with age and pin ** -->
+            <p-calendar (keyup.enter)="focusNextInput(ageInput)"
+
+                        id="birthdate"
+                        class="p-inputtext-lg w-full"
+                        formControlName="birthdate"
+                        [placeholder]="'12/12/2012'"
+                        #birthdateInput>
+            </p-calendar>
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="age">Age</label>
+            <input
+              autocomplete="off"
+              #ageInput
+              id="age"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="age"
+              [placeholder]="'Age'"
+              (keyup.enter)="focusNextInput(emailInput)"
+            />
+          </div>
+        </div>
+        <div class="col-9">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="email">Email Address</label>
+            <input
+              autocomplete="off"
+              #emailInput
+              id="email"
+              class="p-inputtext-lg mt-1 w-full"
+              pInputText
+              [placeholder]="'johndoe@email.com'"
+              formControlName="email"
+              (keyup.enter)="focusNextInput(countyInput)"
+            />
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="sex">Sex</label>
+            <input
+              autocomplete="off"
+              #emailInput
+              id="sex"
+              class="p-inputtext-lg mt-1 w-full"
+              pInputText
+              [placeholder]="'Mr.'"
+              formControlName="sex"
+              (keyup.enter)="focusNextInput(countyInput)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3rd Block-->
+      <div class="grid grid-nogutter">
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="county">County</label>
+            <!--            <input-->
+            <!--              autocomplete="off"-->
+            <!--              #countyInput-->
+            <!--              id="county"-->
+            <!--              class="p-inputtext-lg w-full"-->
+            <!--              pInputText-->
+            <!--              formControlName="county"-->
+            <!--              [placeholder]="'Harghita'"-->
+            <!--              (keyup.enter)="focusNextInput(townInput)"-->
+            <!--            />-->
+            <p-dropdown
+              #countyInput
+              id="county"
+              class="p-inputtext-lg w-full"
+              [options]="counties"
+              formControlName="county"
+              placeholder="County"
+              [filter]="true"
+              optionLabel="name"
+              (keyup.enter)="focusNextInput(townInput)">
+            </p-dropdown>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="town">Town</label>
+            <input
+              autocomplete="off"
+              #townInput
+              id="town"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="town"
+              [placeholder]="'Miercurea-Ciuc'"
+              (keyup.enter)="focusNextInput(addressInput)"
+            />
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="address">Address</label>
+            <input
+              autocomplete="off"
+              #addressInput
+              id="address"
+              class="p-inputtext-lg mt-1 w-full"
+              pInputText
+              formControlName="address"
+              [placeholder]="'Harghita ut. 23'"
+              (keyup.enter)="focusNextInput(allergiesInput)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  2nd Column-->
+    <div class="col">
+      <!-- 4th Block-->
+      <div class="grid grid-nogutter">
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="allergies">Allergies</label>
+            <input
+              autocomplete="off"
+              #allergiesInput
+              id="allergies"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="allergies"
+              [placeholder]="'Peanut allergy'"
+              (keyup.enter)="focusNextInput(previousSurgeriesInput)"
+            />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="previousCares">Previous Surgeries</label>
+            <input
+              autocomplete="off"
+              #previousSurgeriesInput
+              id="previousCares"
+              class="p-inputtext-lg w-full"
+              pInputText
+              formControlName="previousSurgeries"
+              [placeholder]="'Tooth removal: 32'"
+              (keyup.enter)="focusNextInput(chronicDiseasesInput)"
+            />
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="chronicDiseases">Chronic Diseases</label>
+            <textarea
+              #chronicDiseasesInput
+              id="chronicDiseases"
+              class="p-inputtext-lg mt-1 w-full"
+              pInputTextarea
+              formControlName="chronicDiseases"
+              (keydown.control.enter)="focusNextInput(familyHealthHistoryInput)"
+              [placeholder]="'Alzheimer\'s disease'"></textarea>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="field m-1">
+            <label class="px-2 text-sm" for="familyHealthHistory">Family Health History</label>
+            <textarea
+              #familyHealthHistoryInput
+              id="familyHealthHistory"
+              class="p-inputtext-lg mt-1 w-full h-4rem"
+              pInputTextarea
+              formControlName="familyHealthHistory"
+              [placeholder]="'Type 2 Diabetes - Father'"></textarea>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="field m-1">
+            <label class="px-2 text-sm flex justify-content-between">
+              <span>Tooth Chart</span>
+              <span class="text-white-alpha-70">
+                <span
+                  (click)="changeNotationSystem('FDI')"
+                  [class]="notationSystem !== 'FDI' ? 'text-white-alpha-20 hover:text-white-alpha-40' : ''"
+                  class="text-xs cursor-pointer">FDI</span>
+                <span> | </span>
+                <span
+                  (click)="changeNotationSystem('UNS')"
+                  [class]="notationSystem !== 'UNS' ? 'text-white-alpha-20 hover:text-white-alpha-40' : ''"
+                  class="text-xs cursor-pointer">UNS</span>
+              </span>
+            </label>
+            <div class="py-4 px-1 md:px-4 border-1 border-white-alpha-40 border-round flex justify-content-around">
+              <div class="flex flex-column align-items-center tooth top" *ngFor="let tooth of toothNotation.slice(0, 16); index as toothIndex">
+                <img
+                  [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex].status === 'missing'"
+                  (click)="displayTooth(tooth, toothIndex)"
+                  src="assets/images/tooth-molar.png">
+                <span class="my-2">{{tooth.label}}</span>
+              </div>
+            </div>
+            <div class="mt-1 py-4 px-1 md:px-4 border-1 border-white-alpha-40 border-round flex justify-content-around">
+              <div class="flex flex-column align-items-center tooth" *ngFor="let tooth of toothNotation.slice(16); index as toothIndex">
+                <img
+                  [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex].status === 'missing'"
+                  (click)="displayTooth(tooth, toothIndex + 16)"
+                  src="assets/images/tooth-molar.png">
+                <span class="my-2">{{tooth.label}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid grid-nogutter col-12 mt-7 justify-content-end">
+    <div class="my-1 mx-2">
+      <button pRipple type="button" class="p-button-lg px-5 text-gray-800 h-full" (click)="initializePatient()" pButton>
+        <i class="pi pi-save"></i>
+      </button>
+    </div>
+    <div class="my-1">
+      <button pRipple type="button" class="p-button-lg px-5 text-gray-800 h-full" (click)="navigateToPdfViewer()" pButton>
+        <i class="pi pi-file-pdf"></i>
+      </button>
+    </div>
+    <div class="my-1 mx-2">
+      <button
+        pRipple
+        type="button"
+        class="p-button-lg px-5 text-gray-800"
+        (click)="savePatient()"
+        [label]="'Save Patient'"
+        pButton>
+      </button>
+    </div>
+  </div>
+</form>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closeOnEscape]="true"
+          [showHeader]="false"
+          class="tooth-dialog"
+          (onHide)="destroyToothViewer()"
+          [(visible)]="showToothDialog">
+  <app-tooth-viewer
+    class="w-full"
+    (hideToothDialog)="hideTooth()"
+    *ngIf="initializeToothViewer"
+    [patientId]="temporaryPatientId"
+    [toothNotation]="toothNotation"
+    [patientToothChart]="patientToothChart"
+    [patientToothData]="patientToothData"
+    [toothIndex]="toothToShowIndex">
+  </app-tooth-viewer>
+</p-dialog>

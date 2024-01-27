@@ -1,0 +1,51 @@
+[
+  {
+    "patientName": "John Doe",
+    "patientId": "P001",
+    "cabinetNumber": 3,
+    "date": "2023-10-10",
+    "treatment": "Teeth Cleaning"
+  },
+  {
+    "patientName": "Alice Smith",
+    "patientId": "P002",
+    "cabinetNumber": 4,
+    "date": "2023-10-15",
+    "treatment": "Tooth Extraction"
+  },
+  {
+    "patientName": "Bob Johnson",
+    "patientId": "P003",
+    "cabinetNumber": 3,
+    "date": "2023-10-20",
+    "treatment": "Dental Fillings"
+  },
+  {
+    "patientName": "Emily Wilson",
+    "patientId": "P004",
+    "cabinetNumber": 3,
+    "date": "2023-10-25",
+    "treatment": "Root Canal"
+  },
+  {
+    "patientName": "Michael Brown",
+    "patientId": "P005",
+    "cabinetNumber": 3,
+    "date": "2023-10-30",
+    "treatment": "Orthodontic Consultation"
+  },
+  {
+    "patientName": "Olivia Davis",
+    "patientId": "P006",
+    "cabinetNumber": 4,
+    "date": "2023-11-05",
+    "treatment": "Teeth Whitening"
+  },
+  {
+    "patientName": "Sophia Lee",
+    "patientId": "P007",
+    "cabinetNumber": 3,
+    "date": "2023-11-10",
+    "treatment": "Dental Checkup"
+  }
+]

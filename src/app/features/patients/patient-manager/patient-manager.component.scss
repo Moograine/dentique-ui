@@ -1,0 +1,104 @@
+@import 'src/assets/styles/custom';
+@import 'src/assets/styles/variables';
+
+.manager-container {
+  height: calc(100vh - 6rem);
+
+  textarea {
+    height: 9.325rem;
+  }
+
+  .pi-file-pdf, .pi-save {
+    font-size: 1.75rem;
+  }
+
+  .tooth {
+    &.top {
+      img {
+        transform: rotate(180deg);
+
+        &.missing:hover {
+          @media (pointer: fine) {
+            transform: rotate(180deg) !important;
+          }
+        }
+      }
+    }
+
+    img {
+      width: 14px;
+      transition: transform 250ms ease;
+      filter: drop-shadow(.25rem .25rem .25rem $shadow);
+
+      &.missing {
+        opacity: .25;
+
+        &:hover {
+          @media (pointer: fine) {
+            transform: none;
+          }
+        }
+      }
+
+      &:hover {
+        @media (pointer: fine) {
+          z-index: 15;
+          transform: scale(2);
+        }
+      }
+    }
+
+    &.top .missing:hover {
+      transform: rotate(180deg);
+    }
+
+    span {
+      font-size: .6rem;
+    }
+
+    @media(min-width: 375px) {
+      img {
+        width: 20px;
+      }
+      span {
+        font-size: .7rem;
+      }
+    }
+    @media(min-width: 972px) {
+      img {
+        width: 30px;
+      }
+      span {
+        font-size: .8rem;
+      }
+    }
+
+    @media(min-width: 1200px) {
+      img {
+        width: 35px;
+      }
+      span {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+:host::ng-deep {
+  .tooth-dialog {
+    .p-dialog {
+      width: 100vw;
+      height: 100vh;
+      max-height: 100%;
+      box-shadow: none;
+      border: none;
+
+      &-content {
+        background: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+}

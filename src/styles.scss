@@ -1,1 +1,9 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'node_modules/primeflex/primeflex.css';
+@import 'node_modules/primeflex/primeflex.min.css';
+@import 'assets/styles/variables';
+@import 'assets/styles/scroll';
+@import 'assets/styles/default';
+
+body {
+  //--gray-800: rgb(33, 33, 33);
+}
