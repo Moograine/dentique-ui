@@ -1,9 +1,12 @@
-<div class="bg-gray-800 min-w-screen min-h-screen flex">
-  <div class="hidden lg:block">
+<div class="bg-gray-800 min-h-screen flex">
+  <div class="hidden md:block z-5">
     <app-panel></app-panel>
   </div>
-  <div class="w-full">
-    <router-outlet></router-outlet>
+  <div class="w-full relative">
+      <app-header></app-header>
+    <div>
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>
 

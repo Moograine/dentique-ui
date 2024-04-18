@@ -1,11 +1,18 @@
 $text-light-gray: rgb(147, 147, 147);
 $text-muddy-gray: rgb(94, 94, 98);
 $text-white-gray: rgb(225, 225, 225);
+$white: rgb(255, 255, 255);
 $white-silver: rgb(235, 235, 239);
+$white-ultra-transparent: rgba(255, 255, 255, .025);
 $bluegray: rgb(43, 58, 79);
 $purple: rgb(179, 136, 245);
+$red: rgb(148, 32, 32);
 $black: rgb(0, 0, 0);
 $shadow: rgba(0, 0, 0, .5);
+
+/* Tooltip color */
+
+$tooltip-blue: rgb(49, 42, 57);
 
 /* Appointment card gradient colors */
 
@@ -15,7 +22,12 @@ $bluegray_3: rgb(38, 43, 54);
 
 /* Input colours */
 
-$input-primary: rgb(33, 33, 43);
+$primary: rgb(33, 33, 43);
+$secondary: rgb(79, 95, 107);
+$secondary-hover: rgb(113, 142, 157);
+$input-focus: rgb(91, 114, 129);
+$input-active: rgb(100, 120, 131);
+
 
 /* Default button color */
 
@@ -24,7 +36,8 @@ $button-primary-hover: rgb(150, 150, 229);
 
 /* Toast notifiaction background */
 
-$green-transparent: rgba(109, 129, 9, 0.6);
+$green-transparent: rgba(72, 100, 7, 0.6);
+$red-transparent: rgba(182, 34, 34, 0.6);
 
 /* Scroll colours */
 

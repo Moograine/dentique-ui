@@ -1,13 +1,6 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ToothService } from '../../../../../core/services/tooth.service';
-import {
-  PreviousCare,
-  PreviousCareModel,
-  Tooth,
-  ToothModel,
-  ToothNotationModel,
-  ToothStatus
-} from '../../../../../core/models/tooth.model';
+import { PreviousCare, PreviousCareModel, Tooth, ToothModel, ToothNotationModel, ToothStatus } from '../../../../../core/models/tooth.model';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 import { MessageService } from 'primeng/api';
 import { Calendar } from 'primeng/calendar';
@@ -19,23 +12,25 @@ import { Calendar } from 'primeng/calendar';
   providers: [MessageService]
 })
 export class ToothViewerComponent implements AfterViewInit {
-  @ViewChildren('previousCareLabel') previousCareLabels!: QueryList<ElementRef>;
-  @ViewChild('parentContainer') previousCareParentContainer: ElementRef | undefined;
-  @ViewChild('treatmentInput') treatmentInput: ElementRef | undefined;
+  @ViewChildren('previousCareLabel') previousCareLabels?: QueryList<ElementRef>;
+  @ViewChild('parentContainer') previousCareParentContainer?: ElementRef;
+  @ViewChild('treatmentInput') treatmentInput?: ElementRef;
+  @ViewChild('dateInput') dateInput?: Calendar;
   @Output() hideToothDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() patientId: number = 0;
   @Input() toothNotation: ToothNotationModel[] = [];
-  @Input() patientToothChart: ToothModel[] = [];
-  @Input() patientToothData: ToothModel[] = [];
+  @Input() patientToothChart: ToothModel[] = []; /* Patient tooth data in the UI, with a constant number (32) of tooth objects. */
+  @Input() patientToothData: ToothModel[] = []; /* Patient tooth data directly from the API. */
   @Input() toothIndex: number = 0;
   previousCareToShow: PreviousCareModel = new PreviousCare();
-  previousCareToShowIndex = 0;
-  previousCareToShowDate: Date = new Date();
+  previousCareBeforeSave: PreviousCareModel = new PreviousCare();
+  previousCareToShowIndex = -1;
+  isNewPreviousCare = false;
+  cancelSave = false;
   showPreviousCareDialog = false;
   isDragging = false;
   private lastTouchTime = 0;
   private doubleTapDelay = 300;
-  today = new Date();
 
   constructor(private toothService: ToothService, private messageService: MessageService) {
   }
@@ -46,7 +41,7 @@ export class ToothViewerComponent implements AfterViewInit {
 
   /** Initializing previous cares, as the user opens a tooth for inspection. **/
   displayPreviousCares(): void {
-    this.previousCareLabels.forEach((previousCareLabel: ElementRef, previousCareIndex: number) => {
+    this.previousCareLabels?.forEach((previousCareLabel: ElementRef, previousCareIndex: number) => {
       // TODO implement a playful way to display different colors for different labels
       /* Different color combinations for previous care labels. */
       const labelStyles = [
@@ -117,6 +112,7 @@ export class ToothViewerComponent implements AfterViewInit {
   addPreviousCare(event: MouseEvent | TouchEvent): void {
     let positionX = 50; /* Default position value in case of unprecedented event type */
     let positionY = 50; /* Default position value in case of unprecedented event type */
+    this.isNewPreviousCare = true;
 
     if (this.previousCareParentContainer) {
       const { clientX, clientY } = event.type === 'dblclick' ? (event as MouseEvent) : (event as TouchEvent).touches[0];
@@ -134,6 +130,7 @@ export class ToothViewerComponent implements AfterViewInit {
     this.previousCareToShow = this.patientToothChart[this.toothIndex].previousCares[this.previousCareToShowIndex];
 
     const toothIndexApi = this.calculateToothDataIndex();
+    console.log(toothIndexApi);
 
     if (toothIndexApi < 0) {
       /* There is no registered data on this tooth [ by its ID ] so we'll record it in the database, with the previous care. */
@@ -146,25 +143,36 @@ export class ToothViewerComponent implements AfterViewInit {
       this.toothService.saveTooth(this.patientId, this.patientToothData.length - 1, tooth).subscribe();
     } else {
       /* This tooth exists in the database [ by its ID ] so we'll save the previous care directly for the already existing tooth. */
+      this.patientToothData[toothIndexApi].previousCares.push(previousCare);
       this.savePreviousCarePosition(positionX, positionY, this.previousCareToShowIndex);
     }
 
     /* Position the newly added previous care and add color */
     setTimeout(() => {
-      this.previousCareLabels.last.nativeElement.style.top = `${positionY}%`;
-      this.previousCareLabels.last.nativeElement.style.left = `${positionX}%`;
-      this.previousCareLabels.last.nativeElement.style.opacity = 1;
-      this.previousCareLabels.last.nativeElement.firstChild.classList.add('border-blue-600');
-      this.previousCareLabels.last.nativeElement.lastChild.classList.add('bg-blue-600');
-      this.previousCareLabels.last.nativeElement.lastChild.classList.add('border-blue-600');
-      this.previousCareLabels.last.nativeElement.lastChild.classList.add('hover:bg-blue-500');
+      if (this.previousCareLabels) {
+        this.previousCareLabels.last.nativeElement.style.top = `${positionY}%`;
+        this.previousCareLabels.last.nativeElement.style.left = `${positionX}%`;
+        this.previousCareLabels.last.nativeElement.style.opacity = 1;
+        this.previousCareLabels.last.nativeElement.firstChild.classList.add('border-blue-600');
+        this.previousCareLabels.last.nativeElement.lastChild.classList.add('bg-blue-600');
+        this.previousCareLabels.last.nativeElement.lastChild.classList.add('border-blue-600');
+        this.previousCareLabels.last.nativeElement.lastChild.classList.add('hover:bg-blue-500');
+      }
     }, 0);
   }
 
   /** Returns the index of the current tooth which is displayed, on database level. **/
   calculateToothDataIndex(): number {
+    // TODO it's possibly a good idea to optimize this or any similar calculations by SENDING the already pre-caluclated API index from the Patient-Manager
     for (let toothIndex = 0; toothIndex < this.patientToothData.length; toothIndex++) {
-      /* Please note that index starts from 0, id on the other hand is the actual UNS notation based indexing, which starts from 1. */
+      /*
+         Please note that the tooth index system is different on UI and API side.
+         To avoid redundant data in the database, tooth data is registered in the database only if:
+            1. Tooth is missing
+            2. Tooth is replaced with implantation
+            3. Tooth had any previous cares
+         However, on the UI side, there is a constant 32 tooth items which are displayed.
+      */
       if (this.patientToothData[toothIndex].id === this.patientToothChart[this.toothIndex].id) {
         return toothIndex;
       }
@@ -174,38 +182,69 @@ export class ToothViewerComponent implements AfterViewInit {
     return -1;
   }
 
-  closeDialogAndSavePreviousCare(): void {
+  closePreviousCareDialog(): void {
     this.showPreviousCareDialog = false;
-    this.savePreviousCare();
   }
 
-  cancelPreviousCareDialog(): void {
-    this.showPreviousCareDialog = false;
+  onDialogClose(): void {
+    /* Avoid bug, which results in the calendar remaining open while the dialog is closed */
+    this.dateInput && (this.dateInput.overlayVisible = false);
+    if (!this.cancelSave) {
+      this.savePreviousCare();
+    }
+    this.cancelSave = false;
+  }
+
+  isPreviousCareModified(): boolean {
+    return JSON.stringify(this.previousCareBeforeSave) !== JSON.stringify(this.previousCareToShow);
+  }
+
+  deletePreviousCare(): void {
+    this.cancelSave = true;
+    this.closePreviousCareDialog();
+    const toothIndexApi = this.calculateToothDataIndex();
+    this.patientToothData[toothIndexApi].previousCares.splice(this.previousCareToShowIndex, 1);
+    this.patientToothChart[this.toothIndex].previousCares = [ ...this.patientToothData[toothIndexApi].previousCares ];
+
+    if (!this.patientToothData[toothIndexApi].previousCares.length && this.patientToothData[toothIndexApi].status === ToothStatus.Intact) {
+      this.patientToothData.splice(toothIndexApi, 1);
+      this.toothService.savePatientToothChart(this.patientId, this.patientToothData).subscribe(() => {
+        // TODO translation needed
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Previous treatment deleted.' });
+      });
+      return;
+    }
+
+    const tooth: ToothModel = {
+      id: this.patientToothData[toothIndexApi].id,
+      status: this.patientToothData[toothIndexApi].status,
+      previousCares: this.patientToothData[toothIndexApi].previousCares
+    }
+    this.toothService.saveTooth(this.patientId, toothIndexApi, tooth).subscribe(() => {
+      // TODO translation needed
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Previous treatment deleted.' });
+    });
   }
 
   savePreviousCare(): void {
+    if (!this.isPreviousCareModified()) {
+      this.isNewPreviousCare = false;
+      return;
+    }
+
+    /* Similar to calculateToothDataIndex() */
     let toothIndexApi = -1;
     for (let toothIndex = 0; toothIndex < this.patientToothData.length; toothIndex++) {
-      /* Please note that index starts from 0, id on the other hand is the actual UNS notation based indexing, which starts from 1. */
       if (this.patientToothData[toothIndex].id === this.patientToothChart[this.toothIndex].id) {
         toothIndexApi = toothIndex;
         this.toothService.savePreviousCare(this.patientId, toothIndexApi, this.previousCareToShowIndex, this.previousCareToShow).subscribe(() => {
-          // TODO implement condition which prevents saving without any changes made
+          this.isNewPreviousCare = false;
+          // TODO translation needed
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Saved.' });
         });
         break;
       }
     }
-  }
-
-  initializeDate(): void {
-    this.previousCareToShow.date = new Date(this.previousCareToShow.date);
-    if (this.treatmentInput) {
-      this.treatmentInput.nativeElement.focus();
-    }
-    //const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/; /* Default date format used accross the application: 'yyyy-mm-dd' */
-    //this.previousCareToShowDate = dateFormatRegex.test(this.previousCareToShow.date) ? new Date(this.previousCareToShow.date) : new Date();
-    //this.previousCareToShow.date = this.previousCareToShow.date.length ? this.previousCareToShow.date : (new Date()).toISOString().slice(0, 10);
   }
 
   focusNextInput(input: HTMLInputElement | HTMLTextAreaElement | Calendar): void {
@@ -239,6 +278,7 @@ export class ToothViewerComponent implements AfterViewInit {
   displayPreviousCareDialog(previousCareIndex: number): void {
     this.previousCareToShowIndex = previousCareIndex;
     this.previousCareToShow = this.patientToothChart[this.toothIndex].previousCares[previousCareIndex];
+    this.previousCareBeforeSave = new PreviousCare({ ...this.previousCareToShow });
     this.showPreviousCareDialog = !this.isDragging;
     this.isDragging = false;
   }

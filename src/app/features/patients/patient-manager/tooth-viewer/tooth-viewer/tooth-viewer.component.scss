@@ -24,13 +24,9 @@
       height: auto;
 
       &-content {
-        background: $input-primary;
+        background: $primary;
         display: block;
       }
     }
-  }
-
-  .w-75vw {
-    width: 75vw;
   }
 }

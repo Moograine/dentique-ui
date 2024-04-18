@@ -1,4 +1,6 @@
-<router-outlet *ngIf="isInternetAvailable$ | async; else internetUnavailable"></router-outlet>
-<ng-template #internetUnavailable>
-  <app-offline (tryConnection)="tryConnection()"></app-offline>
-</ng-template>
+<!--<router-outlet *ngIf="isInternetAvailable$ | async; else internetUnavailable"></router-outlet>-->
+<!--<ng-template #internetUnavailable>-->
+<!--  <app-offline (tryConnection)="tryConnection()"></app-offline>-->
+<!--</ng-template>-->
+
+<router-outlet></router-outlet>

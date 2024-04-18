@@ -2,14 +2,8 @@
 @import 'src/assets/styles/custom';
 
 .appointment-container {
-  height: calc(100vh - 6rem);
-
   .card {
     background: linear-gradient(90deg, $bluegray_1 0%, $bluegray_2 45%, $bluegray_3 100%);
-  }
-
-  p {
-    word-break: break-word;
   }
 
   h4 {
@@ -19,8 +13,9 @@
   .pi-plus-circle {
     filter: drop-shadow(.15rem .1rem .25rem $shadow);
   }
-}
 
-.w-75vw {
-  width: 75vw;
+  /* Makes vertical scrolling inside the appointment list possible */
+  @media(min-width: 768px) {
+    height: calc(100vh - 5rem);
+  }
 }

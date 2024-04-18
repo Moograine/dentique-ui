@@ -1,0 +1,101 @@
+{
+  "menu": {
+    "welcome": "Welcome",
+    "appointments": "Appointments",
+    "patient_manager": "Patient Manager",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "header": {
+    "search": "Search",
+    "search_name": "Search by name",
+    "no_results": "Couldn't find any results."
+  },
+  "settings": {
+    "doctor_details": "Doctor's Details",
+    "name": "Name",
+    "address": "Address",
+    "company": "Company",
+    "CUI": "CUI",
+    "application_settings": "Application Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "tooth_notation": "Tooth Chart Notation"
+  },
+  "appointments": {
+    "patient": "Patient",
+    "appointment": "Appointment",
+    "date": "Date",
+    "cabinet": "Cabinet",
+    "treatment": "Treatment",
+    "no_appointment": "No appointment found",
+    "conflict_dialog": {
+      "title": "Conflict",
+      "already_registered": "A patient is already registered for this telephone number:",
+      "no_match": "However, the name you entered for the appointment, doesn't match the name of the registered patient:",
+      "appointment_name": "Name in the Appointment:",
+      "original_name": "Original Name:",
+      "modify": "Modify:",
+      "tooltip": "Click on Appointment, and the name you entered on the appointment form will be replaced with name on registered patient form. \nClick on the Patient, and the appointment will be saved as it is, and the patient form will be updated in the background with the modified name"
+    }
+  },
+  "patient_manager": {
+    "allergies": "Allergies",
+    "previous_surgeries": "Previous Surgeries",
+    "chronic_diseases": "Chronic Diseases",
+    "family_health_history": "Family Health History",
+    "no_records": "No records",
+    "patient_details": {
+      "allergies": "allergies",
+      "allergy": "Allergy",
+      "previous_surgeries": "previous surgeries",
+      "operations": "Operations",
+      "chronic_diseases": "chronic diseases",
+      "disease": "Disease",
+      "family_health_history": "family health history",
+      "history": "History",
+      "recorded": "Recorded",
+      "no_records": "There are no recorded",
+      "add": "Add"
+    },
+    "x_rays": {
+      "title": "X - Rays",
+      "upload": "Upload",
+      "no_x_rays": "There are no X-Rays uploaded yet"
+    },
+    "tooth_chart": "Tooth Chart",
+    "FDI": "FDI",
+    "UNS": "UNS"
+  },
+  "form": {
+    "first_name": "Name",
+    "last_name": "Family Name",
+    "phone": "Phone Number",
+    "PIN": "CNP",
+    "birthday": "Date of Birth",
+    "date": "Date",
+    "age": "Age",
+    "email": "Email Address",
+    "sex": "Sex",
+    "county": "County",
+    "town": "Town",
+    "address": "Address",
+    "treatment": "Treatment",
+    "description": "Description"
+  },
+  "notifications": {
+    "appointment_created": "Appointment Created!",
+    "appointment_deleted": "Appointment Canceled!",
+    "appointment_updated": "Appointment Updated!",
+    "saved": "Saved!",
+    "error": "Something Went Wrong!"
+  },
+  "button": {
+    "save": "Save",
+    "save_patient": "Save Patient",
+    "cancel": "Cancel",
+    "close": "Close",
+    "login": "Login",
+    "try_again": "Try Again"
+  }
+}

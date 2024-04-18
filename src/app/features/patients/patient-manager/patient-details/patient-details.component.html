@@ -1,0 +1,49 @@
+<div #patientDetailsContainer *ngIf="patient[patientDetailType].length" class="w-75vw max-h-75vh sm:w-26rem overflow-auto">
+  <p class="mt-0 mb-3">{{ 'patient_manager.patient_details.recorded' | translate }} {{ 'patient_manager.patient_details.' + translations.title | translate }}:</p>
+  <div class="border-top-1 border-bottom-1 border-bluegray-800 m-0 col font-bold">
+    {{ 'patient_manager.patient_details.' + translations.header | translate }}:
+  </div>
+  <div aria-label="list-item-selector">
+    <div *ngFor="let item of patient[patientDetailType]; index as index; trackBy: ngForTracker"
+         class="py-1 border-bottom-1 border-bluegray-800 flex justify-content-between align-items-center text-sm sm:text-base">
+      <span *ngIf="index !== editableItemIndex" class="col-8 word-break">{{ item }}</span>
+      <input
+        class="col-8 bg-transparent border-none border-bottom-1 outline-none h-2rem text-base border-bluegray-700 hover:border-bluegray-500 transition-duration-200"
+        (keyup.enter)="savePatientDetail(!patient[patientDetailType][index].length)"
+        [(ngModel)]="patient[patientDetailType][index]"
+        *ngIf="index === editableItemIndex"/>
+      <div class="col-4 py-1 flex justify-content-end align-items-center">
+        <i
+          *ngIf="index !== editableItemIndex"
+          (click)="editPatientDetail(index, patientDetailsContainer)"
+          class="pi pi-pencil text-sm cursor-pointer text-white-alpha-70 hover:text-white transition-duration-100 border-1 border-white-alpha-10 border-round hover:bg-white-alpha-5 p-2">
+        </i>
+        <div *ngIf="index === editableItemIndex" class="flex align-items-center gap-1 ml-2">
+          <i
+            (click)="deletePatientDetail(index)"
+            class="pi pi-trash text-sm cursor-pointer text-white-alpha-70 hover:text-white transition-duration-100 border-1 border-white-alpha-10 border-round hover:bg-white-alpha-5 p-2">
+          </i>
+          <i
+            (click)="cancelPatientDetailEdit()"
+            class="pi pi-times text-sm cursor-pointer text-white-alpha-70 hover:text-white transition-duration-100 border-1 border-white-alpha-10 border-round hover:bg-white-alpha-5 p-2">
+          </i>
+          <i
+            (click)="savePatientDetail(!patient[patientDetailType][index].length)"
+            [class]="!patient[patientDetailType][index].length ? 'opacity-70' : 'hover:text-white hover:bg-white-alpha-5 cursor-pointer'"
+            class="pi pi-check text-sm text-white-alpha-70 transition-duration-100 border-1 border-white-alpha-10 border-round p-2">
+          </i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p *ngIf="!patient[patientDetailType].length" class="w-75vw sm:w-26rem text-center mt-0 mb-3">
+  {{ 'patient_manager.patient_details.no_records' | translate }} {{ 'patient_manager.patient_details.' + translations.title | translate}}.
+</p>
+<div class="flex justify-content-end">
+  <button [disabled]="editableItemIndex > -1" (click)="addPatientDetail(patientDetailsContainer)" pRipple class="p-button p-button-sm mt-3">
+    <i class="pi pi-plus mr-1 text-xs font-bold"></i>
+    <span>{{ 'patient_manager.patient_details.add' | translate }}</span>
+  </button>
+</div>
+

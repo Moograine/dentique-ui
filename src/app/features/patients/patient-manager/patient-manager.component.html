@@ -1,25 +1,22 @@
-<div class="h-5rem border-white-alpha-10 border-bottom-1 mx-3">
-</div>
-
 <form [formGroup]="patientFormGroup"
       (keydown.control.shift.enter)="savePatient()"
-      class="p-2 md:p-3 manager-container overflow-auto text-white-alpha-80">
+      class="p-2 md:p-3 manager-container md:overflow-auto text-white-alpha-80">
   <!--  Main Container-->
-  <div class="grid flex-column md:flex-row">
+  <div class="grid flex-column xl:flex-row gap-2">
     <!--    1st Column-->
-    <div class="col">
+    <div class="col xl:pr-0">
       <!-- 1st Block-->
       <div class="grid grid-nogutter">
         <div class="col-6">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="firstName">Name</label>
+            <label class="px-2 text-sm" for="firstName">{{ 'form.first_name' | translate }}</label>
             <input
               autocomplete="off"
-              #firstNameInput
               id="firstName"
               class="p-inputtext-lg w-full"
               pInputText
               formControlName="firstName"
+              [minLength]="1"
               [placeholder]="'John'"
               (keyup.enter)="focusNextInput(lastNameInput)"
             />
@@ -27,7 +24,7 @@
         </div>
         <div class="col-6">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="lastName">Family Name</label>
+            <label class="px-2 text-sm" for="lastName">{{ 'form.last_name' | translate }}</label>
             <input
               autocomplete="off"
               #lastNameInput
@@ -35,39 +32,66 @@
               class="p-inputtext-lg w-full"
               pInputText
               formControlName="lastName"
+              [minLength]="1"
               [placeholder]="'Doe'"
               (keyup.enter)="focusNextInput(phoneInput)"
             />
           </div>
         </div>
         <div class="col-12">
-          <div class="field m-1">
-            <label class="px-2 text-sm" for="phone">Phone Number</label>
-            <input
-              autocomplete="off"
-              #phoneInput
-              id="phone"
-              class="p-inputtext-lg mt-1 w-full"
-              pInputText
-              formControlName="phone"
-              [placeholder]="'+40712345678'"
-              (keyup.enter)="focusNextInput(PINInput)"
-            />
+          <div class="field m-1 phone-input">
+            <label class="px-2 text-sm" for="phone">{{ 'form.phone' | translate }}</label>
+            <div class="flex">
+              <p-dropdown
+                class="p-inputtext-lg"
+                [options]="countryCodes"
+                [(ngModel)]="selectedCountryCode"
+                [ngModelOptions]="standaloneConfiguration"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="10"
+                [filter]="true"
+                optionLabel="name">
+                <ng-template pTemplate="selectedItem">
+                  <div class="flex align-items-center justify-content-center gap-1" *ngIf="selectedCountryCode">
+                    <img [src]="selectedCountryCode.image" [alt]="selectedCountryCode.name" width="25"/>
+                    <div>{{ selectedCountryCode.dial_code }}</div>
+                  </div>
+                </ng-template>
+                <ng-template let-country pTemplate="item">
+                  <div *ngIf="country.dial_code?.length" class="flex align-items-center gap-2">
+                    ({{country.dial_code}}) {{ country.name }}
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <input
+                autocomplete="off"
+                #phoneInput
+                id="phone"
+                pKeyFilter="int"
+                class="p-inputtext-lg"
+                pInputText
+                formControlName="phone"
+                [maxLength]="15"
+                [minLength]="7"
+                [placeholder]="'712345678'"
+                (keyup.enter)="focusNextInput(PINInput)"/>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 2nd Block-->
       <div class="grid grid-nogutter">
-        <div class="col-6">
+        <div class="col-12 sm:col-5">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="PIN">CNP</label>
+            <label class="px-2 text-sm" for="PIN">{{ 'form.PIN' | translate }}</label>
             <input
               autocomplete="off"
               #PINInput
               id="PIN"
               class="p-inputtext-lg w-full"
               pInputText
+              pKeyFilter="int"
               formControlName="PIN"
               [placeholder]="'5001212121234'"
               (ngModelChange)="calculateBirthday(PINInput.value)"
@@ -76,29 +100,29 @@
           </div>
         </div>
         <!--  You actually don't need the birthdate, you can calculate it from the romanian CNP, the age as well and gender -->
-        <div class="col-4">
+        <div class="col-7 sm:col-5">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="birthdate">Date of Birth</label>
+            <label class="px-2 text-sm" for="birthdate">{{ 'form.birthday' | translate }}</label>
             <!--            (ngModelChange)="focusNextInput(ageInput)"            ** behaviour issue with age and pin ** -->
             <p-calendar (keyup.enter)="focusNextInput(ageInput)"
-
                         id="birthdate"
-                        class="p-inputtext-lg w-full"
+                        class="p-inputtext-lg"
                         formControlName="birthdate"
-                        [placeholder]="'12/12/2012'"
+                        [placeholder]="'00/00/0000'"
                         #birthdateInput>
             </p-calendar>
           </div>
         </div>
-        <div class="col-2">
+        <div class="col-5 sm:col-2">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="age">Age</label>
+            <label class="px-2 text-sm" for="age">{{ 'form.age' | translate }}</label>
             <input
               autocomplete="off"
               #ageInput
               id="age"
               class="p-inputtext-lg w-full"
               pInputText
+              pKeyFilter="int"
               formControlName="age"
               [placeholder]="'Age'"
               (keyup.enter)="focusNextInput(emailInput)"
@@ -107,7 +131,7 @@
         </div>
         <div class="col-9">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="email">Email Address</label>
+            <label class="px-2 text-sm" for="email">{{ 'form.email' | translate }}</label>
             <input
               autocomplete="off"
               #emailInput
@@ -120,9 +144,10 @@
             />
           </div>
         </div>
+        <!--        TODO FIX DISPLAY ISSUE WITH LABEL BEING A BIT MORE ELEVATED THAN REST-->
         <div class="col-3">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="sex">Sex</label>
+            <label class="px-2 text-sm" for="sex">{{ 'form.sex' | translate }}</label>
             <input
               autocomplete="off"
               #emailInput
@@ -141,21 +166,11 @@
       <div class="grid grid-nogutter">
         <div class="col-6">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="county">County</label>
-            <!--            <input-->
-            <!--              autocomplete="off"-->
-            <!--              #countyInput-->
-            <!--              id="county"-->
-            <!--              class="p-inputtext-lg w-full"-->
-            <!--              pInputText-->
-            <!--              formControlName="county"-->
-            <!--              [placeholder]="'Harghita'"-->
-            <!--              (keyup.enter)="focusNextInput(townInput)"-->
-            <!--            />-->
+            <label class="px-2 text-sm" for="county">{{ 'form.county' | translate }}</label>
             <p-dropdown
               #countyInput
               id="county"
-              class="p-inputtext-lg w-full"
+              class="p-inputtext-lg"
               [options]="counties"
               formControlName="county"
               placeholder="County"
@@ -167,7 +182,7 @@
         </div>
         <div class="col-6">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="town">Town</label>
+            <label class="px-2 text-sm" for="town">{{ 'form.town' | translate }}</label>
             <input
               autocomplete="off"
               #townInput
@@ -182,7 +197,7 @@
         </div>
         <div class="col-12">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="address">Address</label>
+            <label class="px-2 text-sm" for="address">{{ 'form.address' | translate }}</label>
             <input
               autocomplete="off"
               #addressInput
@@ -191,7 +206,6 @@
               pInputText
               formControlName="address"
               [placeholder]="'Harghita ut. 23'"
-              (keyup.enter)="focusNextInput(allergiesInput)"
             />
           </div>
         </div>
@@ -199,81 +213,172 @@
     </div>
 
     <!--  2nd Column-->
-    <div class="col">
+    <div class="col xl:pl-0">
       <!-- 4th Block-->
       <div class="grid grid-nogutter">
-        <div class="col-6">
+        <div class="col-12 sm:col-6">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="allergies">Allergies</label>
-            <input
-              autocomplete="off"
-              #allergiesInput
-              id="allergies"
-              class="p-inputtext-lg w-full"
-              pInputText
-              formControlName="allergies"
-              [placeholder]="'Peanut allergy'"
-              (keyup.enter)="focusNextInput(previousSurgeriesInput)"
-            />
+            <label class="px-2 text-sm">{{ 'patient_manager.allergies' | translate }}</label>
+            <div (click)="displayPatientDetailsDialog('allergies')" class="flex">
+              <div class="p-inputtext p-inputtext-lg border-noround-right flex overflow-hidden white-space-nowrap">
+                <div class="patient-details-content white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                  <ng-container *ngFor="let allergy of patient.allergies; last as last; index as index">
+                    <span>{{ allergy }}</span>
+                    <span *ngIf="!last && patient.allergies[index]?.length">, </span>
+                  </ng-container>
+                  <span *ngIf="!patient.allergies.length" class="text-gray-600">{{ 'patient_manager.no_records' | translate }}</span>
+                </div>
+              </div>
+              <div pRipple class="p-inputtext p-inputtext-lg w-fit px-3 border-noround-left cursor-pointer">
+                <i class="pi pi-pencil text-xl pr-1"></i>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="col-6">
+        <div class="col-12 sm:col-6">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="previousCares">Previous Surgeries</label>
-            <input
-              autocomplete="off"
-              #previousSurgeriesInput
-              id="previousCares"
-              class="p-inputtext-lg w-full"
-              pInputText
-              formControlName="previousSurgeries"
-              [placeholder]="'Tooth removal: 32'"
-              (keyup.enter)="focusNextInput(chronicDiseasesInput)"
-            />
+            <label class="px-2 text-sm">{{ 'patient_manager.previous_surgeries' | translate }}</label>
+            <div (click)="displayPatientDetailsDialog('previousSurgeries')" class="flex">
+              <div class="p-inputtext p-inputtext-lg border-noround-right flex overflow-hidden white-space-nowrap">
+                <div class="patient-details-content white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                  <ng-container *ngFor="let surgery of patient.previousSurgeries; last as last; index as index">
+                    <span>{{ surgery }}</span>
+                    <span *ngIf="!last && patient.previousSurgeries[index]?.length">, </span>
+                  </ng-container>
+                  <span *ngIf="!patient.previousSurgeries.length" class="text-gray-600">{{ 'patient_manager.no_records' | translate }}</span>
+                </div>
+              </div>
+              <div pRipple class="p-inputtext p-inputtext-lg w-fit px-3 border-noround-left cursor-pointer">
+                <i class="pi pi-pencil text-xl pr-1"></i>
+              </div>
+            </div>
           </div>
         </div>
         <div class="col-12">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="chronicDiseases">Chronic Diseases</label>
+            <label class="px-2 text-sm" for="chronicDiseases">{{ 'patient_manager.chronic_diseases' | translate }}</label>
             <textarea
-              #chronicDiseasesInput
+              (click)="displayPatientDetailsDialog('chronicDiseases')"
+              [(ngModel)]="patient.chronicDiseases"
+              [ngModelOptions]="standaloneConfiguration"
               id="chronicDiseases"
-              class="p-inputtext-lg mt-1 w-full"
+              class="p-inputtext-lg w-full"
               pInputTextarea
-              formControlName="chronicDiseases"
-              (keydown.control.enter)="focusNextInput(familyHealthHistoryInput)"
               [placeholder]="'Alzheimer\'s disease'"></textarea>
           </div>
         </div>
-        <div class="col-12">
+        <div class="col-12 sm:col-8">
           <div class="field m-1">
-            <label class="px-2 text-sm" for="familyHealthHistory">Family Health History</label>
-            <textarea
-              #familyHealthHistoryInput
-              id="familyHealthHistory"
-              class="p-inputtext-lg mt-1 w-full h-4rem"
-              pInputTextarea
-              formControlName="familyHealthHistory"
-              [placeholder]="'Type 2 Diabetes - Father'"></textarea>
+            <label class="px-2 text-sm">{{ 'patient_manager.family_health_history' | translate }}</label>
+            <div (click)="displayPatientDetailsDialog('familyHealthHistory')" class="flex">
+              <div class="p-inputtext p-inputtext-lg border-noround-right flex overflow-hidden white-space-nowrap">
+                <div class="patient-details-content white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                  <ng-container *ngFor="let healthHistory of patient.familyHealthHistory; last as last; index as index">
+                    <span>{{ healthHistory }}</span>
+                    <span *ngIf="!last && patient.familyHealthHistory[index]?.length">, </span>
+                  </ng-container>
+                  <span *ngIf="!patient.familyHealthHistory.length" class="text-gray-600">{{ 'patient_manager.no_records' | translate }}</span>
+                </div>
+              </div>
+              <div pRipple class="p-inputtext p-inputtext-lg w-fit px-3 border-noround-left cursor-pointer">
+                <i class="pi pi-pencil text-xl pr-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 sm:col-4 cursor-pointer ">
+          <div class="field m-1">
+            <label class="px-2 text-sm">{{ 'patient_manager.x_rays.title' | translate }}</label>
+            <div (click)="displayXRayGallery()"
+                 [class]="!patientFormGroup.valid ? 'opacity-40 cursor-auto' : 'hover:text-white-alpha-90'"
+                 class="p-inputtext p-inputtext-lg flex justify-content-center align-items-center gap-2 text-white-alpha-70">
+              <i class="pi pi-eye"></i>
+              <span>Show</span>
+            </div>
+            <p-galleria
+              #galleria
+              [value]="XRayFileCollection"
+              [(visible)]="showXRayGallery"
+              [numVisible]="7"
+              [circular]="true"
+              [fullScreen]="true"
+              [(activeIndex)]="activeXRayIndex"
+              (activeIndexChange)="onGalleriaItemChange($event)"
+              indicatorsPosition="left"
+              [showItemNavigators]="true"
+              [showThumbnails]="false">
+              <ng-template pTemplate="item" let-XRay>
+                                <p class="absolute bottom-100 mb-3 text-white">[ name: {{ XRayFileCollection[activeXRayIndex].file.name }} ]</p>
+                <p class="absolute top-0 left-0 my-1 mx-2 text-gray-700 font-bold text-sm">{{ activeXRayIndex + 1 }}.</p>
+                <img class="w-full max-h-85vh" [src]="displayedXRaySrc"/>
+                <i
+                  *ngIf="isXRayInEditMode"
+                  (click)="deletePatientXRay()"
+                  class="pi pi-trash cursor-pointer text-white-alpha-80 hover:text-white-alpha-90 shadow-8
+                  transition-duration-200 border-1 border-white-alpha-50 hover:border-white-alpha-60 border-round
+                  bg-white-alpha-10 hover:bg-white-alpha-20 p-2 m-2 flex align-items-center absolute bottom-0 left-0">
+                </i>
+                <div class="w-full flex justify-content-between align-items-center absolute top-100 left-0 my-3 px-2 lg:px-0">
+                  <div class="flex gap-2">
+                    <div class="w-6rem flex align-items-center">
+                      <p-calendar
+                        class="p-inputtext-sm"
+                        [disabled]="!isXRayInEditMode"
+                        (ngModelChange)="onXRayDateChange($event)"
+                        [dateFormat]="'yy/mm/dd'"
+                        [(ngModel)]="XRay.date"
+                        [ngModelOptions]="standaloneConfiguration">
+                      </p-calendar>
+                    </div>
+                    <i
+                      *ngIf="!isXRayInEditMode"
+                      (click)="enableXRayEditMode()"
+                      class="pi pi-pencil cursor-pointer text-white-alpha-80 hover:text-white-alpha-90
+                      transition-duration-200 border-1 border-secondary hover:border-secondary border-round
+                      px-3 flex align-items-center">
+                    </i>
+                    <i
+                      *ngIf="isXRayInEditMode"
+                      (click)="disableXRayEditMode()"
+                      class="pi pi-check cursor-pointer text-white-alpha-80 hover:text-white-alpha-90
+                      transition-duration-200 border-1 border-secondary hover:border-secondary border-round
+                      bg-black-alpha-20 hover:bg-black-alpha-10 px-3 flex align-items-center">
+                    </i>
+                  </div>
+                  <p-fileUpload
+                    #fileUploader
+                    mode="basic"
+                    accept="image/*"
+                    [maxFileSize]="5000000"
+                    (uploadHandler)="onPatientXRayUpload($event, fileUploader)"
+                    [customUpload]="true"
+                    [chooseLabel]="'patient_manager.x_rays.upload' | translate"
+                    [auto]="true">
+                  </p-fileUpload>
+                </div>
+              </ng-template>
+            </p-galleria>
+<!--          TODO  no translation needed, this button must be removed! -->
+            <button class="p-button" (click)="savePatientXRays()">Save X-Rays</button>
           </div>
         </div>
         <div class="col-12">
           <div class="field m-1">
             <label class="px-2 text-sm flex justify-content-between">
-              <span>Tooth Chart</span>
+              <span>{{ 'patient_manager.tooth_chart' | translate }}</span>
               <span class="text-white-alpha-70">
                 <span
                   (click)="changeNotationSystem('FDI')"
                   [class]="notationSystem !== 'FDI' ? 'text-white-alpha-20 hover:text-white-alpha-40' : ''"
-                  class="text-xs cursor-pointer">FDI</span>
+                  class="text-xs cursor-pointer">{{ 'patient_manager.FDI' | translate }}</span>
                 <span> | </span>
                 <span
                   (click)="changeNotationSystem('UNS')"
                   [class]="notationSystem !== 'UNS' ? 'text-white-alpha-20 hover:text-white-alpha-40' : ''"
-                  class="text-xs cursor-pointer">UNS</span>
+                  class="text-xs cursor-pointer">{{ 'patient_manager.UNS' | translate }}</span>
               </span>
             </label>
-            <div class="py-4 px-1 md:px-4 border-1 border-white-alpha-40 border-round flex justify-content-around">
+            <div class="py-4 px-1 md:px-4 border-1 border-bluegray-700 border-round flex justify-content-around">
               <div class="flex flex-column align-items-center tooth top" *ngFor="let tooth of toothNotation.slice(0, 16); index as toothIndex">
                 <img
                   [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex].status === 'missing'"
@@ -282,10 +387,10 @@
                 <span class="my-2">{{tooth.label}}</span>
               </div>
             </div>
-            <div class="mt-1 py-4 px-1 md:px-4 border-1 border-white-alpha-40 border-round flex justify-content-around">
+            <div class="mt-1 py-4 px-1 md:px-4 border-1 border-bluegray-700 border-round flex justify-content-around">
               <div class="flex flex-column align-items-center tooth" *ngFor="let tooth of toothNotation.slice(16); index as toothIndex">
                 <img
-                  [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex].status === 'missing'"
+                  [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex + 16].status === 'missing'"
                   (click)="displayTooth(tooth, toothIndex + 16)"
                   src="assets/images/tooth-molar.png">
                 <span class="my-2">{{tooth.label}}</span>
@@ -297,11 +402,6 @@
     </div>
   </div>
   <div class="grid grid-nogutter col-12 mt-7 justify-content-end">
-    <div class="my-1 mx-2">
-      <button pRipple type="button" class="p-button-lg px-5 text-gray-800 h-full" (click)="initializePatient()" pButton>
-        <i class="pi pi-save"></i>
-      </button>
-    </div>
     <div class="my-1">
       <button pRipple type="button" class="p-button-lg px-5 text-gray-800 h-full" (click)="navigateToPdfViewer()" pButton>
         <i class="pi pi-file-pdf"></i>
@@ -312,8 +412,9 @@
         pRipple
         type="button"
         class="p-button-lg px-5 text-gray-800"
+        [disabled]="patientFormGroup.invalid"
         (click)="savePatient()"
-        [label]="'Save Patient'"
+        [label]="'button.save_patient' | translate"
         pButton>
       </button>
     </div>
@@ -340,3 +441,45 @@
     [toothIndex]="toothToShowIndex">
   </app-tooth-viewer>
 </p-dialog>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          (onHide)="onPatientDetailsDialogHide()"
+          [(visible)]="showPatientDetailsDialog">
+  <app-patient-details
+    *ngIf="patientDetailsType.length"
+    [patientDetailType]="patientDetailsType || 'allergies'"
+    [patient]="patient">
+  </app-patient-details>
+</p-dialog>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          [(visible)]="showUploadXRayDialog">
+  <p *ngIf="!XRayFileCollection.length" class="w-75vw sm:w-26rem text-center mt-0 mb-3">
+    {{ 'patient_manager.x_rays.no_x_rays' | translate }}.
+  </p>
+  <div class="flex justify-content-end">
+    <p-fileUpload
+      #fileUploader
+      mode="basic"
+      accept="image/*"
+      [maxFileSize]="5000000"
+      (uploadHandler)="onPatientXRayUpload($event, fileUploader)"
+      [customUpload]="true"
+      class="m-3"
+      [chooseLabel]="'patient_manager.x_rays.upload' | translate"
+      [auto]="true">
+    </p-fileUpload>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

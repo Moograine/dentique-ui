@@ -1,0 +1,72 @@
+<div class="p-3 sm:p-4 flex flex-column md:flex-row md:gap-8 text-white-alpha-80">
+  <div>
+    <h2 class="font-medium mt-0 mb-3">{{ 'settings.doctor_details' | translate }}</h2>
+    <div class="mx-1 flex flex-column gap-2">
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.name' | translate }}: </p>
+        <p class="m-0 p-3 border-1 border-white-alpha-10 hover:border-white-alpha-30 border-round w-fit">
+          Dr. Josh Moograine
+        </p>
+      </div>
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.address' | translate }}: </p>
+        <p class="m-0 p-3 border-1 border-white-alpha-10 hover:border-white-alpha-30 border-round w-fit">
+          Miercurea-Ciuc, Romania, Str. Jigodin, nr. 1
+        </p>
+      </div>
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.company' | translate }}: </p>
+        <p class="m-0 p-3 border-1 border-white-alpha-10 hover:border-white-alpha-30 border-round w-fit">
+          Josh Moograine Dental S.R.L.
+        </p>
+      </div>
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.CUI' | translate }}: </p>
+        <p class="m-0 p-3 border-1 border-white-alpha-10 hover:border-white-alpha-30 border-round w-fit">
+          5442705
+        </p>
+      </div>
+    </div>
+  </div>
+  <div>
+    <h2 class="font-medium my-3 md:mt-0">{{ 'settings.application_settings' | translate }}</h2>
+    <div class="mx-1 flex flex-column gap-2">
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.language' | translate }}: </p>
+        <div class="w-fit">
+          <p-dropdown
+            class="language"
+            [options]="languageOptions"
+            optionLabel="language"
+            [(ngModel)]="selectedLanguage"
+            (onChange)="changeLanguage($event.value)">
+            <ng-template pTemplate="selectedItem">
+              <div class="flex align-items-center gap-1">
+                <img class="flag" [src]="'assets/images/flags/' + selectedLanguage.code + '.png'">
+                <span class="pb-xs">{{ selectedLanguage.language }}</span>
+              </div>
+            </ng-template>
+            <ng-template let-languageOption pTemplate="item">
+              <div class="flex align-items-center gap-1">
+                <img class="flag" [src]="'assets/images/flags/' + languageOption.code + '.png'">
+                <span class="pb-xs">{{ languageOption.language }}</span>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </div>
+      </div>
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.theme' | translate }}: </p>
+        <div class="w-fit">
+          <p-dropdown [options]="themeOptions" [(ngModel)]="selectedTheme"></p-dropdown>
+        </div>
+      </div>
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.tooth_notation' | translate }}: </p>
+        <div class="w-fit">
+          <p-dropdown (onChange)="changeNotationSystem($event.value)" [options]="notationSystemOptions" [(ngModel)]="selectedNotationSystem"></p-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

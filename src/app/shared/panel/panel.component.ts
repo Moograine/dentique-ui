@@ -7,17 +7,20 @@ import { Router } from '@angular/router';
   styleUrls: ['./panel.component.scss']
 })
 export class PanelComponent {
-  openSettingsModal = false;
 
   constructor(private router: Router) {
   }
 
-  openSettings(): void {
-    this.openSettingsModal = true;
-  }
-
   navigateToAppointments(): void {
     this.router.navigate((['/appointments'])).then();
+  }
+
+  navigateToPatientManager(): void {
+    this.router.navigate((['/patient-manager'])).then();
+  }
+
+  navigateToSettings(): void {
+    this.router.navigate((['/settings'])).then();
   }
 
   logout(): void {

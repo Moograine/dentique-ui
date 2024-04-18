@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Dobrodošli",
+    "appointments": "Termini",
+    "patient_manager": "Upravljanje Pacijentima",
+    "settings": "Podešavanja",
+    "logout": "Odjava"
+  },
+  "settings": {
+    "doctor_details": "Podaci o Doktoru",
+    "name": "Ime",
+    "address": "Adresa",
+    "company": "Kompanija",
+    "CUI": "CUI",
+    "application_settings": "Podešavanja Aplikacije",
+    "language": "Jezik",
+    "theme": "Tema"
+  },
+  "appointments": {
+    "patient": "Pacijent",
+    "date": "Datum",
+    "cabinet": "Kabinet",
+    "treatment": "Tretman"
+  },
+  "patient_manager": {
+    "allergies": "Alergije",
+    "chronic_diseases": "Hronične Bolesti",
+    "family_health_history": "Istorija Porodičnog Zdravlja",
+    "tooth_chart": "Dentalni Karton",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Sačuvaj Pacijenta"
+  },
+  "form": {
+    "first_name": "Ime",
+    "last_name": "Prezime",
+    "phone": "Broj Telefona",
+    "PIN": "CNP",
+    "birthday": "Datum Rođenja",
+    "date": "Datum",
+    "age": "Godine",
+    "email": "Email Adresa",
+    "sex": "Pol",
+    "county": "Opština",
+    "town": "Grad",
+    "address": "Adresa"
+  },
+  "notifications": {
+    "appointment_created": "Termin Kreiran!",
+    "appointment_deleted": "Termin Otkazan!",
+    "appointment_updated": "Termin Ažuriran!",
+    "saved": "Sačuvano!",
+    "error": "Došlo je do Greške!"
+  },
+  "button": {
+    "save": "Sačuvaj",
+    "save_patient": "Sačuvaj Pacijenta",
+    "cancel": "Otkaži",
+    "close": "Zatvori",
+    "login": "Prijava",
+    "try_again": "Pokušaj Ponovo"
+  }
+}

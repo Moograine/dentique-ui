@@ -12,31 +12,3 @@
     padding-top: .1rem;
   }
 }
-
-//:host::ng-deep {
-//  .p-inputtext {
-//    background-color: rgba(255, 255, 255, .2);
-//    //filter: blur(.15rem);
-//    backdrop-filter: blur(.2rem);
-//    color: rgba(255, 255, 255, .95) !important;
-//    border-color: rgb(100, 100, 114);
-//
-//    &:focus {
-//      box-shadow: 0 0 3px 0 rgb(117, 144, 161);
-//    }
-//    &:hover {
-//      border: 1px solid rgb(139, 176, 196);
-//    }
-//    &:-webkit-autofill {
-//      transition: background-color 5000s ease-in-out 0s;
-//    }
-//  }i {
-//     z-index: 3;
-//     color: rgba(255, 255, 255, .95) !important;
-//   }
-//
-//  .p-inputtext:focus,
-//  .p-inputtext:active {
-//    border-color: rgb(100, 120, 131);
-//  }
-//}

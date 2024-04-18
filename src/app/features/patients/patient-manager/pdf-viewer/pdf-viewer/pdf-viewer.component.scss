@@ -1,6 +1,12 @@
 @import 'src/assets/styles/variables';
 
+.pdf-viewer {
+  //height: 90vh;
+  transform: scale(3);
+}
+
 .pdf-container {
+
   width: 13.25rem;
 
   img {

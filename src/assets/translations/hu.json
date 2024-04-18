@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Üdvözöljük",
+    "appointments": "Időpontok",
+    "patient_manager": "Pácienskezelő",
+    "settings": "Beállítások",
+    "logout": "Kijelentkezés"
+  },
+  "settings": {
+    "doctor_details": "Orvos Részletei",
+    "name": "Név",
+    "address": "Cím",
+    "company": "Cég",
+    "CUI": "CUI",
+    "application_settings": "Alkalmazás Beállításai",
+    "language": "Nyelv",
+    "theme": "Téma"
+  },
+  "appointments": {
+    "patient": "Páciens",
+    "date": "Dátum",
+    "cabinet": "Kabinet",
+    "treatment": "Kezelés"
+  },
+  "patient_manager": {
+    "allergies": "Allergiák",
+    "chronic_diseases": "Krónikus Betegségek",
+    "family_health_history": "Családi Egészségügyi Előzmények",
+    "tooth_chart": "Fogtérkép",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Páciens Mentése"
+  },
+  "form": {
+    "first_name": "Név",
+    "last_name": "Családnév",
+    "phone": "Telefonszám",
+    "PIN": "Személyi Igazolvány Szám",
+    "birthday": "Születési Dátum",
+    "date": "Dátum",
+    "age": "Kor",
+    "email": "Email Cím",
+    "sex": "Nem",
+    "county": "Megye",
+    "town": "Város",
+    "address": "Cím"
+  },
+  "notifications": {
+    "appointment_created": "Időpont Létrehozva!",
+    "appointment_deleted": "Időpont Törölve!",
+    "appointment_updated": "Időpont Frissítve!",
+    "saved": "Mentve!",
+    "error": "Hiba Történt!"
+  },
+  "button": {
+    "save": "Mentés",
+    "save_patient": "Páciens Mentése",
+    "cancel": "Mégse",
+    "close": "Bezárás",
+    "login": "Bejelentkezés",
+    "try_again": "Próbálkozz újra"
+  }
+}

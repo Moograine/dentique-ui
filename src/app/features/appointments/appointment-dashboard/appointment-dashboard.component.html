@@ -1,52 +1,57 @@
-<div class="h-5rem border-white-alpha-10 border-bottom-1 mx-3"></div>
-
-<div class="mt-1 p-2 sm:p-3 appointment-container overflow-auto relative">
-  <div *ngFor="let date of appointments | keyvalue">
-    <p class="m-0 font-bold text-white-alpha-80">{{date.key}}</p>
+<div class="p-2 sm:p-3 appointment-container md:overflow-auto relative">
+  <h3 class="m-1 sm:m-0 text-center text-white-alpha-60" *ngIf="emptyAppointmentCollection(appointments)">
+    {{ 'appointments.no_appointment' | translate }}
+  </h3>
+  <div *ngFor="let appointmentGroups of appointments | keyvalue">
+    <div *ngIf="appointmentGroups.value.length" class="m-0 flex font-bold text-blue-5005 text-bluegray-600">
+      <span>{{appointmentGroups.key | date : 'yyyy/MM/dd' }}</span>
+      <span class="border-bottom-1 border-bluegray-600 block w-full mx-3 mb-2"></span>
+    </div>
     <div
-      *ngFor="let appointment of date.value; index as index"
+      *ngFor="let appointment of appointmentGroups.value; index as index"
       class="scalein card shadow-2 animation-duration-200 mx-2 my-3 sm:m-3 p-3 sm:p-4 border-round-xl text-white-alpha-70">
       <div class="flex justify-content-between align-items-center">
         <div class="text-sm sm:text-base">
           <div class="flex">
             <i class="pi pi-user"></i>
-            <h4 class="mx-1 my-0">Patient: </h4>
-            <p (click)="navigateToPatient(appointment['firstName'] + appointment['lastName'])"
-               class="my-0 hover:text-white-alpha-90 cursor-pointer">{{appointment['firstName']}} {{appointment['lastName']}}</p>
+            <h4 class="mx-1 my-0">{{ 'appointments.patient' | translate }}: </h4>
+            <p (click)="navigateToPatient(appointment['phone'])"
+               class="my-0 hover:text-white-alpha-90 cursor-pointer word-break">{{appointment['firstName']}} {{appointment['lastName']}}</p>
           </div>
           <div class="flex pt-1">
             <i class="pi pi-calendar"></i>
-            <h4 class="mx-1 my-0">Date: </h4>
-            <p class="my-0">{{appointment['date'] | date : 'h:mm, EEEE'}}</p>
+            <h4 class="mx-1 my-0">{{ 'appointments.date' | translate }}: </h4>
+            <p class="my-0 font-bold text-white-alpha-80 word-break">{{appointment['date'] | date : 'h:mm'}}</p>
+            <span>{{appointment['date'] | date : ', EEEE'}}</span>
           </div>
           <div class="flex pt-1">
             <i class="pi pi-home"></i>
-            <h4 class="mx-1 my-0">Cabinet: </h4>
-            <p class="my-0">{{appointment['cabinetNumber']}}</p>
+            <h4 class="mx-1 my-0">{{ 'appointments.cabinet' | translate }}: </h4>
+            <p class="my-0 word-break">{{appointment['cabinetNumber']}}</p>
           </div>
           <div class="flex pt-1">
             <i class="pi pi-heart"></i>
-            <h4 class="mx-1 my-0">Treatment: </h4>
-            <p class="my-0">{{appointment['description']}}</p>
+            <h4 class="mx-1 my-0">{{ 'appointments.treatment' | translate }}: </h4>
+            <p class="my-0 word-break">{{appointment['description']}}</p>
           </div>
         </div>
         <div class="flex flex-column sm:flex-row justify-content-center align-items-center gap-2">
-          <button pRipple class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-green-900 hover:bg-green-800">
-            <i class="pi pi-check text-sm md:text-xl text-white-alpha-80"></i>
-          </button>
-          <button pRipple (click)="deleteAppointment(date.key, index)" class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-red-800 hover:bg-red-700">
+          <button
+            pRipple
+            (click)="deleteAppointment(appointmentGroups.key, index)"
+            class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-red-800 hover:bg-red-700">
             <i class="pi pi-trash text-sm md:text-xl text-white-alpha-80"></i>
           </button>
-          <button pRipple (click)="displayUpdateAppointmentDialog(date.key, index, appointment)" class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-gray-700 hover:bg-gray-600">
+          <button
+            pRipple
+            (click)="displayUpdateAppointmentDialog(appointmentGroups.key, index, appointment)"
+            class="p-button p-2 sm:px-3 md:py-3 md:px-4 bg-gray-700 hover:bg-gray-600">
             <i class="pi pi-cog text-sm md:text-xl text-white-alpha-80"></i>
           </button>
         </div>
       </div>
     </div>
   </div>
-  <!--  <i class="pi pi-plus-circle text-5xl text-green-700 transition-duration-200 hover:text-green-600 cursor-pointer fixed mr-4 mb-5 bottom-0 right-0"-->
-  <!--     (click)="displayAddAppointmentDialog()">-->
-  <!--  </i>-->
   <button
     pRipple
     (click)="displayAddAppointmentDialog()"
@@ -56,48 +61,158 @@
   </button>
 </div>
 
-<p-toast></p-toast>
-
 <p-dialog [modal]="true"
           [dismissableMask]="true"
           [resizable]="false"
           [autoZIndex]="false"
-          [closeOnEscape]="true"
-          (onHide)="onDialogClose()"
+          [closeOnEscape]="false"
+          [closable]="true"
+          (onHide)="onAppointmentDialogClose()"
+          (onShow)="focusNextInput(firstNameInput)"
           [(visible)]="showAppointmentDialog">
-  <form (keydown.control.shift.enter)="editedAppointmentIndex < 0 ? saveAppointment() : updateAppointment()" [formGroup]="appointmentFormGroup">
+  <form (keydown.control.enter)="editedAppointmentIndex < 0 ? saveAppointment() : updateAppointment()" [formGroup]="appointmentFormGroup">
     <div class="grid grid-nogutter w-75vw sm:w-22rem">
       <div class="col-6 pr-1">
-        <p class="m-1 text-sm text-white-alpha-70">Name:</p>
-        <input (keyup.enter)="focusNextInput(lastNameInput)" pInputText formControlName="firstName"/>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'form.first_name' | translate }}:</p>
+        <input type="text" (keyup.enter)="focusNextInput(lastNameInput)" #firstNameInput pInputText formControlName="firstName"/>
       </div>
       <div class="col-6 pl-1">
-        <p class="m-1 text-sm text-white-alpha-70">Family Name:</p>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'form.last_name' | translate }}:</p>
         <input (keyup.enter)="focusNextInput(phoneInput)" #lastNameInput pInputText formControlName="lastName"/>
       </div>
     </div>
-    <p class="m-1 text-sm text-white-alpha-70">Phone:</p>
-    <input (keyup.enter)="focusNextInput(dateInput)" #phoneInput pInputText formControlName="phone"/>
-    <p class="m-1 pt-1 text-sm text-white-alpha-70">Date:</p>
-    <div class="calendar">
-      <p-calendar
-        #dateInput
-        [minDate]="today"
-        [dateFormat]="'yy/mm/dd'"
-        (keyup.enter)="focusNextInput(descriptionInput)"
-        formControlName="date">
-      </p-calendar>
+    <p class="m-1 text-sm text-white-alpha-70">{{ 'form.phone' | translate }}</p>
+    <div class="flex phone-input">
+      <p-dropdown
+        [options]="countryCodes"
+        [(ngModel)]="selectedCountryCode"
+        [ngModelOptions]="standaloneConfiguration"
+        [virtualScroll]="true"
+        [virtualScrollItemSize]="10"
+        [filter]="true"
+        optionLabel="name">
+        <ng-template pTemplate="selectedItem">
+          <div class="flex align-items-center justify-content-center gap-1" *ngIf="selectedCountryCode">
+            <img [src]="selectedCountryCode.image" [alt]="selectedCountryCode.name" width="25"/>
+            <div>{{ selectedCountryCode.dial_code }}</div>
+          </div>
+        </ng-template>
+        <ng-template let-country pTemplate="item">
+          <div *ngIf="country.dial_code?.length" class="flex align-items-center gap-2">
+            ({{country.dial_code}}) {{ country.name }}
+          </div>
+        </ng-template>
+      </p-dropdown>
+      <input
+        autocomplete="off"
+        #phoneInput
+        id="phone"
+        pKeyFilter="int"
+        class="p-inputtext"
+        pInputText
+        formControlName="phone"
+        [maxLength]="15"
+        [minlength]="7"
+        [minLength]="7"
+        [placeholder]="'712345678'"
+        (keyup.enter)="focusNextInput(dateInput)"/>
     </div>
-    <p class="m-1 pt-1 text-sm text-white-alpha-70">Description:</p>
+    <div class="flex gap-2">
+      <div class="w-full">
+        <p class="m-1 pt-1 text-sm text-white-alpha-70">{{ 'form.date' | translate }}:</p>
+        <p-calendar
+          #dateInput
+          [minDate]="today"
+          [dateFormat]="'yy/mm/dd'"
+          (ngModelChange)="updateTime($event, timeInput)"
+          (keyup.enter)="focusNextInput(timeInput)"
+          formControlName="date">
+        </p-calendar>
+      </div>
+      <div class="flex align-items-end">
+        <p-calendar
+          #timeInput
+          (keyup.enter)="focusNextInput(descriptionInput)"
+          [timeOnly]="true"
+          formControlName="date">
+        </p-calendar>
+      </div>
+    </div>
+
+    <p class="m-1 pt-1 text-sm text-white-alpha-70">{{ 'form.description' | translate }}:</p>
     <textarea #descriptionInput pInputTextarea formControlName="description"></textarea>
     <div class="flex gap-2 justify-content-end mt-2">
-      <button pRipple type="button" (click)="closeAppointmentDialog()" class="p-button cancel">Cancel</button>
+      <button pRipple type="button" (click)="closeAppointmentDialog()" class="p-button cancel">{{ 'button.cancel' | translate }}</button>
       <button pRipple
               type="button"
-              [disabled]="!appointmentFormGroup.value.date"
+              [disabled]="!appointmentFormGroup.valid"
               (click)="editedAppointmentIndex < 0 ? saveAppointment() : updateAppointment()"
-              class="p-button">Save
+              class="p-button">{{ 'button.save' | translate }}
       </button>
     </div>
   </form>
+  <button (click)="showAppointmentConflictDialog = true" class="p-button">Conflict</button>
 </p-dialog>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="false"
+          [closeOnEscape]="false"
+          [(visible)]="showAppointmentConflictDialog">
+  <ng-template pTemplate="header">
+    <div class="w-full flex justify-content-between align-items-center">
+      <span class="mx-2">{{ 'appointments.conflict_dialog.title' | translate }}</span>
+      <div class="p-button-icon">
+        <button (click)="resolveAppointmentConflict('')" type="button" class="p-dialog-header-icon cursor-pointer">
+          <i pRipple class="pi pi-times"></i>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+  <div class="sm:w-17re max-w-30rem flex flex-column mt-1">
+    <span>
+      {{ 'appointments.conflict_dialog.already_registered' | translate }}
+    </span>
+    <span class="m-1 text-green-800 font-bold text-lg">
+      {{ selectedCountryCode.dial_code + appointmentFormGroup.value['phone']}}
+    </span>
+    <span>
+      {{ 'appointments.conflict_dialog.no_match' | translate }}
+    </span>
+    <span class="text-xs text-white-alpha-80 mt-3">
+      {{ 'appointments.conflict_dialog.appointment_name' | translate }}
+    </span>
+    <span class="m-1 p-2 text-red-700 font-bold text-lg border-1 border-round border-bluegray-700 w-fit">
+      {{ appointmentFormGroup.value['firstName'] }} {{ appointmentFormGroup.value['lastName'] }}
+    </span>
+    <span class="text-xs text-white-alpha-80">{{ 'appointments.conflict_dialog.appointment_name' | translate }}</span>
+    <span class="m-1 p-2 text-blue-700 font-bold text-lg border-1 border-round border-bluegray-700 w-fit">
+      {{ appointmentConflictDetails?.patientFirstName }} {{ appointmentConflictDetails?.patientLastName }}
+    </span>
+    <div class="flex justify-content-between align-items-center mt-2">
+      <i class="pi pi-question-circle mx-1 mt-4 text-bluegray-700 hover:text-bluegray-600 transition-duration-200"
+         #tooltip
+         [tooltipEvent]="'focus'"
+         [tabindex]="0"
+         (mouseover)="showTooltip($event, tooltip)"
+         (mouseleave)="hideTooltip($event, tooltip)"
+         (click)="showTooltip($event, tooltip)"
+         [pTooltip]="'appointments.conflict_dialog.tooltip' | translate">
+      </i>
+      <div>
+        <span class="text-xs text-white-alpha-80">{{ 'appointments.conflict_dialog.modify' | translate }}</span>
+        <div class="flex gap-1 mt-1">
+          <button class="p-button p-button-sm" (click)="resolveAppointmentConflict('overrideAppointment'); ">
+            {{ 'appointments.appointment' | translate }}
+          </button>
+          <button class="p-button p-button-sm bg-blue-700 hover:bg-blue-600" (click)="resolveAppointmentConflict('overridePatient');">
+            {{ 'appointments.patient' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Willkommen",
+    "appointments": "Termine",
+    "patient_manager": "Patientenverwaltung",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "settings": {
+    "doctor_details": "Arztdetails",
+    "name": "Name",
+    "address": "Adresse",
+    "company": "Firma",
+    "CUI": "CUI",
+    "application_settings": "Anwendungseinstellungen",
+    "language": "Sprache",
+    "theme": "Thema"
+  },
+  "appointments": {
+    "patient": "Patient",
+    "date": "Datum",
+    "cabinet": "Kabine",
+    "treatment": "Behandlung"
+  },
+  "patient_manager": {
+    "allergies": "Allergien",
+    "chronic_diseases": "Chronische Krankheiten",
+    "family_health_history": "Familiengesundheitsgeschichte",
+    "tooth_chart": "Zahnkarte",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Patient Speichern"
+  },
+  "form": {
+    "first_name": "Name",
+    "last_name": "Familienname",
+    "phone": "Telefonnummer",
+    "PIN": "CNP",
+    "birthday": "Geburtsdatum",
+    "date": "Datum",
+    "age": "Alter",
+    "email": "E-Mail-Adresse",
+    "sex": "Geschlecht",
+    "county": "Kreis",
+    "town": "Stadt",
+    "address": "Adresse"
+  },
+  "notifications": {
+    "appointment_created": "Termin erstellt!",
+    "appointment_deleted": "Termin gelöscht!",
+    "appointment_updated": "Termin aktualisiert!",
+    "saved": "Gespeichert!",
+    "error": "Etwas ist schiefgelaufen!"
+  },
+  "button": {
+    "save": "Speichern",
+    "save_patient": "Patient speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "login": "Anmelden",
+    "try_again": "Erneut versuchen"
+  }
+}

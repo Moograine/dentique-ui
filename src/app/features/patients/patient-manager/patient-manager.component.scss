@@ -2,7 +2,10 @@
 @import 'src/assets/styles/variables';
 
 .manager-container {
-  height: calc(100vh - 6rem);
+  /* Makes vertical scrolling inside the patient manager possible */
+  @media(min-width: 768px) {
+    height: calc(100vh - 5rem);
+  }
 
   textarea {
     height: 9.325rem;
@@ -64,16 +67,62 @@
         font-size: .7rem;
       }
     }
-    @media(min-width: 972px) {
+
+    @media(min-width: 450px) {
       img {
-        width: 30px;
+        width: 25px;
       }
       span {
         font-size: .8rem;
       }
     }
 
+    @media(min-width: 550px) {
+      img {
+        width: 30px;
+      }
+      span {
+        font-size: .9rem;
+      }
+    }
+
+    @media(min-width: 767px) {
+      img {
+        width: 25px;
+      }
+      span {
+        font-size: .8rem;
+      }
+    }
+
+    @media(min-width: 992px) {
+      img {
+        width: 35px;
+      }
+      span {
+        font-size: 1rem;
+      }
+    }
+
     @media(min-width: 1200px) {
+      img {
+        width: 25px;
+      }
+      span {
+        font-size: .85rem;
+      }
+    }
+
+    @media(min-width: 1300px) {
+      img {
+        width: 30px;
+      }
+      span {
+        font-size: .9rem;
+      }
+    }
+
+    @media(min-width: 1400px) {
       img {
         width: 35px;
       }
@@ -85,6 +134,38 @@
 }
 
 :host::ng-deep {
+  .patient-details-content {
+    @media(max-width: 768px) {
+      max-width: calc(100vw - 8.5rem);
+    }
+
+    @media(min-width: 769px) {
+      max-width: calc(50vw - 1.5rem);
+    }
+
+    @media(min-width: 1200px) {
+      max-width: calc(30vw - 1rem);
+    }
+  }
+
+  .p-fileupload {
+
+
+    @media(max-width: 325px) {
+      .p-button {
+        padding: .75rem 1rem;
+
+        .p-button-icon {
+          margin-right: 0;
+        }
+      }
+
+      .p-button-label {
+        display: none;
+      }
+    }
+  }
+
   .tooth-dialog {
     .p-dialog {
       width: 100vw;

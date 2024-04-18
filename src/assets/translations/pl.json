@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Witaj",
+    "appointments": "Wizyty",
+    "patient_manager": "Zarządzanie Pacjentami",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj"
+  },
+  "settings": {
+    "doctor_details": "Dane Lekarza",
+    "name": "Imię",
+    "address": "Adres",
+    "company": "Firma",
+    "CUI": "CUI",
+    "application_settings": "Ustawienia Aplikacji",
+    "language": "Język",
+    "theme": "Motyw"
+  },
+  "appointments": {
+    "patient": "Pacjent",
+    "date": "Data",
+    "cabinet": "Gabinet",
+    "treatment": "Zabieg"
+  },
+  "patient_manager": {
+    "allergies": "Alergie",
+    "chronic_diseases": "Choroby Przewlekłe",
+    "family_health_history": "Historia Zdrowia Rodzinnego",
+    "tooth_chart": "Karta Zębowa",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Zapisz Pacjenta"
+  },
+  "form": {
+    "first_name": "Imię",
+    "last_name": "Nazwisko",
+    "phone": "Numer Telefonu",
+    "PIN": "CNP",
+    "birthday": "Data Urodzenia",
+    "date": "Data",
+    "age": "Wiek",
+    "email": "Adres Email",
+    "sex": "Płeć",
+    "county": "Powiat",
+    "town": "Miasto",
+    "address": "Adres"
+  },
+  "notifications": {
+    "appointment_created": "Wizyta Utworzona!",
+    "appointment_deleted": "Wizyta Anulowana!",
+    "appointment_updated": "Wizyta Zaktualizowana!",
+    "saved": "Zapisano!",
+    "error": "Coś Poszło Nie Tak!"
+  },
+  "button": {
+    "save": "Zapisz",
+    "save_patient": "Zapisz Pacjenta",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "login": "Zaloguj się",
+    "try_again": "Spróbuj Ponownie"
+  }
+}

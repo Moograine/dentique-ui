@@ -11,7 +11,7 @@ import { ToothService } from '../../../../../core/services/tooth.service';
 })
 export class PdfViewerComponent implements OnInit, AfterViewInit {
   @ViewChild('content') content!: ElementRef;
-  patient: PatientModel = this.patientService.activePatient;
+  patient: PatientModel = this.patientService.activePatient.getValue();
 
   constructor(private patientService: PatientService, private toothService: ToothService) {
   }
@@ -33,12 +33,13 @@ export class PdfViewerComponent implements OnInit, AfterViewInit {
     this.patient.county = 'Harghita';
     this.patient.town = 'Miercurea-Ciuc';
     this.patient.address = 'Str. Jigodin, nr. 1';
-    console.log(this.patientService.activePatient);
   }
 
   generatePDF(): void {
     const pdf = new jsPDF({ format: 'a4' });
-    pdf.html(this.content.nativeElement, {
+    const pdfTemplate = this.content.nativeElement.cloneNode(true);
+    pdfTemplate.style.transform = 'scale(0.8)';
+    pdf.html(pdfTemplate, {
       callback: (pdf: jsPDF) => pdf.save('receipt.pdf')
     });
   }

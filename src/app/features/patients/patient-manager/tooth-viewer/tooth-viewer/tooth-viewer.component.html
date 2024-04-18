@@ -17,17 +17,16 @@
           class="label max-w-17rem border-bottom-1 p-1 sm:p-2
             border-round-top text-xs lg:text-base transition-duration-200 cursor-pointer">
           <span class="text-white-alpha-90">{{previousCare.treatment}}</span>
-          <span *ngIf="previousCare.treatment.length && previousCare.date" class="text-white-alpha-70">: {{previousCare.date | date : 'YYYY-MM-dd'}}</span>
+          <span *ngIf="previousCare.treatment.length && previousCare.date"
+                class="text-white-alpha-70">: {{previousCare.date | date : 'YYYY-MM-dd'}}</span>
         </div>
       </div>
     </div>
     <div class="flex my-4 justify-content-center">
-      <button pRipple (click)="closeToothDialog()" class="p-button font-medium">Close</button>
+      <button pRipple (click)="closeToothDialog()" class="p-button font-medium">{{ 'button.close' | translate }}</button>
     </div>
   </div>
 </div>
-
-<p-toast></p-toast>
 
 <p-dialog [modal]="true"
           [dismissableMask]="true"
@@ -35,28 +34,31 @@
           [autoZIndex]="false"
           [closeOnEscape]="true"
           class="previous-care-dialog"
-          (keydown.control.enter)="closeDialogAndSavePreviousCare()"
+          (onHide)="onDialogClose()"
+          (keydown.control.enter)="closePreviousCareDialog()"
           [(visible)]="showPreviousCareDialog">
-  <p class="m-1 text-sm text-white-alpha-70 w-75vw sm:w-20rem">Treatment:</p>
+  <p class="m-1 text-sm text-white-alpha-70 w-75vw sm:w-20rem">{{ 'form.treatment' | translate }}:</p>
   <input (keyup.enter)="focusNextInput(dateInput)" #treatmentInput pInputText [(ngModel)]="previousCareToShow.treatment"/>
-  <p class="m-1 pt-1 text-sm text-white-alpha-70">Date:</p>
-  <div>
-    <p-calendar
-      #dateInput
-      (keyup.enter)="focusNextInput(descriptionInput)"
-      [dateFormat]="'yy/mm/dd'"
-      [(ngModel)]="previousCareToShow.date">
-    </p-calendar>
-  </div>
-  <p class="m-1 pt-1 text-sm text-white-alpha-70">Description:</p>
-  <textarea #descriptionInput pInputTextarea [(ngModel)]="previousCareToShow.description"></textarea>
-  <div class="flex gap-2 justify-content-end mt-2">
-    <button pRipple type="button" (click)="cancelPreviousCareDialog()" class="p-button cancel">Cancel</button>
-    <button pRipple
-            type="button"
-            [disabled]="!previousCareToShow.treatment"
-            (click)="closeDialogAndSavePreviousCare()"
-            class="p-button">Save
+  <p class="m-1 pt-1 text-sm text-white-alpha-70">{{ 'form.date' | translate }}:</p>
+  <p-calendar
+    #dateInput
+    (keyup.enter)="focusNextInput(descriptionInput)"
+    [dateFormat]="'yy/mm/dd'"
+    [(ngModel)]="previousCareToShow.date">
+  </p-calendar>
+  <p class="m-1 pt-1 text-sm text-white-alpha-70">{{ 'form.description' | translate }}</p>
+  <textarea #descriptionInput pInputTextarea class="h-6rem" [(ngModel)]="previousCareToShow.description"></textarea>
+  <div [class]="isNewPreviousCare ? 'justify-content-end' : 'justify-content-between'" class="flex mt-3">
+    <button
+      *ngIf="!isNewPreviousCare"
+      pRipple
+      type="button"
+      (click)="deletePreviousCare()"
+      class="p-button bg-transparent border-1 border-solid border-gray-700 hover:bg-gray-700 text-white-alpha-70 hover:text-white-alpha-90">
+      <i class="pi pi-trash text-xl"></i>
     </button>
+    <button pRipple type="button" (click)="closePreviousCareDialog()" class="p-button">Done</button>
   </div>
 </p-dialog>
+
+<p-toast></p-toast>

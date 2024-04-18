@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Ласкаво просимо",
+    "appointments": "Призначення",
+    "patient_manager": "Управління Пацієнтами",
+    "settings": "Налаштування",
+    "logout": "Вийти"
+  },
+  "settings": {
+    "doctor_details": "Дані Лікаря",
+    "name": "Ім'я",
+    "address": "Адреса",
+    "company": "Компанія",
+    "CUI": "CUI",
+    "application_settings": "Налаштування Додатка",
+    "language": "Мова",
+    "theme": "Тема"
+  },
+  "appointments": {
+    "patient": "Пацієнт",
+    "date": "Дата",
+    "cabinet": "Кабінет",
+    "treatment": "Лікування"
+  },
+  "patient_manager": {
+    "allergies": "Алергії",
+    "chronic_diseases": "Хронічні Захворювання",
+    "family_health_history": "Історія Здоров'я Сім'ї",
+    "tooth_chart": "Зубна Карта",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Зберегти Пацієнта"
+  },
+  "form": {
+    "first_name": "Ім'я",
+    "last_name": "Прізвище",
+    "phone": "Номер Телефону",
+    "PIN": "CNP",
+    "birthday": "Дата Народження",
+    "date": "Дата",
+    "age": "Вік",
+    "email": "Email Адреса",
+    "sex": "Стать",
+    "county": "Округ",
+    "town": "Місто",
+    "address": "Адреса"
+  },
+  "notifications": {
+    "appointment_created": "Призначення Створено!",
+    "appointment_deleted": "Призначення Скасовано!",
+    "appointment_updated": "Призначення Оновлено!",
+    "saved": "Збережено!",
+    "error": "Щось Пішло Не Так!"
+  },
+  "button": {
+    "save": "Зберегти",
+    "save_patient": "Зберегти Пацієнта",
+    "cancel": "Скасувати",
+    "close": "Закрити",
+    "login": "Увійти",
+    "try_again": "Спробувати Знову"
+  }
+}

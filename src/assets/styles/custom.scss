@@ -3,26 +3,29 @@
 :host::ng-deep {
   .p-inputtext {
     width: 100%;
-    background-color: $input-primary;
-    // border-color: rgb(70, 70, 79);
-    border-color: rgb(79, 95, 107);
+    background-color: $primary;
+    border-color: $secondary;
 
     &:focus {
-      box-shadow: 0 0 3px 0 rgb(91, 114, 129);
+      box-shadow: 0 0 3px 0 $input-focus;
     }
 
     &:hover {
-      border: 1px solid rgb(113, 142, 157);
+      border: 1px solid $secondary-hover;
     }
 
     &:-webkit-autofill {
       transition: background-color 5000s ease-in-out 0s;
     }
+
+    &.ng-dirty.ng-invalid {
+      border-color: $red;
+    }
   }
 
   .p-inputtext:focus,
   .p-inputtext:active {
-    border-color: rgb(100, 120, 131);
+    border-color: $input-active;
   }
 
   .field {
@@ -36,14 +39,13 @@
   .p-calendar {
     width: 100%;
 
-    //rgb(113, 142, 157);
     .p-datepicker {
-      background: $input-primary;
-      border-color: $input-primary;
+      background: $primary;
+      border-color: $primary;
 
       &-header {
-        background: $input-primary;
-        border-color: $input-primary;
+        background: $primary;
+        border-color: $primary;
       }
 
       @media(max-width: 335px) {
@@ -55,27 +57,45 @@
     }
   }
 
+  .p-calendar-timeonly {
+    input {
+      width: 4rem;
+      text-align: center;
+    }
+
+    @media(max-width: 576px) {
+      .p-datepicker-timeonly {
+        left: auto !important;
+        right: 0 !important;
+      }
+    }
+  }
+
   .p-dropdown {
     width: 100%;
-    border: .1rem solid rgb(79, 95, 107);
-    background-color: $input-primary;
+    border: .1rem solid $secondary;
+    background-color: $primary;
 
     &:not(.p-disabled).p-focus {
-      border: .1rem solid rgb(79, 95, 107);
+      border: .1rem solid $secondary;
     }
 
     &.p-focus {
-      border: .1rem solid rgb(79, 95, 107);
+      border: .1rem solid $secondary;
+    }
+
+    .p-dropdown-label.p-placeholder {
+      color: $text-muddy-gray;
     }
 
     .p-dropdown-panel {
-      background: $input-primary;
+      background: $primary;
       border: none;
 
       .p-dropdown-header {
         padding: 0;
-        border-bottom: .1rem solid rgb(51, 51, 68);
-        background: $input-primary;
+        border-bottom: .1rem solid $bluegray_2;
+        background: $primary;
 
         .p-dropdown-filter-container {
           .p-inputtext {
@@ -85,25 +105,57 @@
       }
     }
 
-    &-trigger {
-    }
-
     .p-inputtext {
       border: none !important;
     }
 
     &:hover {
-      border: 1px solid rgb(113, 142, 157);
+      border: 1px solid $secondary-hover;
     }
 
     &:not(.p-disabled).p-focus {
-      box-shadow: 0 0 3px 0 rgb(91, 114, 129);
+      box-shadow: 0 0 3px 0 $input-focus;
+    }
+  }
+
+  .phone-input {
+    input {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    .p-dropdown {
+      height: 100%;
+      align-items: center;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &-label {
+        padding: 0 .75rem;
+      }
+
+      &-trigger {
+        display: none;
+      }
+
+      &-panel {
+        width: 17.5rem;
+        overflow-x: hidden;
+
+        @media(max-width: 300px) {
+          width: 16rem;
+        }
+
+        .p-scroller {
+          overflow-x: hidden;
+        }
+      }
     }
   }
 
   .p-dropdown:focus,
   .p-dropdown:active {
-    border-color: rgb(100, 120, 131);
+    border-color: $input-active;
   }
 
   .p-button {
@@ -134,23 +186,184 @@
     }
   }
 
-  .p-toast .p-toast-message.p-toast-message-success {
-    background: $green-transparent;
-  }
-}
+  .p-toast {
+    max-width: calc(100vw - 2.5rem);
+    opacity: 1;
 
-:host::ng-deep {
+    &-message {
+      backdrop-filter: blur(.75rem);
+
+      &.p-toast-message-success {
+        background: $green-transparent;
+      }
+
+      &.p-toast-message-error {
+        background: $red-transparent;
+      }
+    }
+  }
+
+  .p-chips {
+    width: 100%;
+    border-color: $secondary;
+
+    &:focus {
+      box-shadow: 0 0 3px 0 $input-focus;
+    }
+
+    .p-chips-multiple-container::-webkit-scrollbar {
+      width: 20px; /* Adjust the width of the scrollbar */
+    }
+
+    .p-chips-multiple-container {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+      max-width: 35rem;
+      flex-wrap: unset;
+
+      @media(max-width: 768px) {
+        max-width: calc(100vw - 24px);
+      }
+
+      .p-chips-token {
+        font-size: 1rem;
+      }
+
+      .p-chips-input-token {
+        padding: 0;
+
+        input {
+          @media(max-width: 325px) {
+            width: 13.5rem;
+          }
+
+          width: 15rem;
+        }
+      }
+
+      &:hover {
+        border-color: $input-active;
+      }
+
+      &:not(.p-disabled).p-focus {
+        box-shadow: 0 0 3px 0 $input-focus;
+        border-color: $input-active;
+      }
+    }
+
+    .p-inputtext {
+      //padding: .5rem;
+
+      input {
+        font-size: 1.25rem;
+
+        &::-webkit-input-placeholder {
+          color: $text-muddy-gray;
+        }
+
+        &::-moz-placeholder {
+          color: $text-muddy-gray;
+        }
+
+        &:-ms-input-placeholder {
+          color: $text-muddy-gray;
+        }
+
+        &:-moz-placeholder {
+          color: $text-muddy-gray;
+        }
+      }
+    }
+
+    &.ng-dirty.ng-invalid {
+      border-color: $red;
+    }
+  }
+
+  /* Customized style for PrimeNG Dialog */
   .p-dialog {
+    margin: .25rem;
     border: none;
 
     &-header {
-      background-color: $input-primary;
+      background-color: $primary;
       padding: .5rem;
     }
 
     &-content {
-      background-color: $input-primary;
+      background-color: $primary;
       overflow: visible;
+      padding-bottom: 1.5rem;
+    }
+
+    &-mask {
+      z-index: 5;
+    }
+  }
+
+  /* Customized style for PrimeNG Gallery */
+  .p-galleria-content {
+    max-width: 57.5rem;
+
+    .p-galleria-item-nav {
+      margin-top: -1.75rem;
+    }
+  }
+
+  .w-75vw {
+    width: 75vw;
+  }
+
+  .max-h-75vh {
+    max-height: 75vh;
+  }
+
+  .max-h-85vh {
+    max-height: 85vh;
+  }
+
+  .bg-secondary {
+    background-color: $secondary;
+  }
+
+  .hover\:bg-secondary:hover {
+    background-color: $secondary-hover;
+  }
+
+  .border-secondary {
+    border-color: $secondary;
+  }
+
+  .hover\:border-secondary:hover {
+    border-color: $secondary-hover;
+  }
+
+  .hover\:bg-white-alpha-5:hover {
+    background-color: $white-ultra-transparent;
+  }
+
+  .word-break {
+    word-wrap: break-word;
+  }
+}
+
+::ng-deep {
+  /* Customized style for PrimeNG Tooltip */
+  .p-tooltip {
+    margin-left: .25rem;
+    width: auto;
+    max-width: initial;
+
+    .p-tooltip-text {
+      background-color: $tooltip-blue;
+      color: $white-silver;
+      min-width: 14rem;
+      max-width: 20rem;
+    }
+
+    .p-tooltip-arrow {
+      border-right-color: $tooltip-blue !important;
     }
   }
 }

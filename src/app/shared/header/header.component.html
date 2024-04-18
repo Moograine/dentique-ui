@@ -1,1 +1,127 @@
-<p>header works!</p>
+<div class="relative h-5rem bg-gray-800">
+  <div [class]="!activePhoneMenu ? 'bg-gray-800 border-white-alpha-10 border-bottom-1': ''"
+       class="fixed header top-0 h-5rem z-3 px-1 sm:px-3 flex align-items-center justify-content-between">
+
+    <div #searchContainer [class.opacity-0]="activePhoneMenu" class="flex align-items-center max-w-16rem sm:max-w-fit relative">
+      <div *ngIf="selectedDefaultSearch.option === 'phone'" class="flex phone-input h-2rem">
+        <p-dropdown
+          [options]="countryCodes"
+          [(ngModel)]="selectedCountryCode"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="10"
+          [filter]="true"
+          class="p-inputtext-sm"
+          optionLabel="name">
+          <ng-template pTemplate="selectedItem">
+            <div class="flex align-items-center justify-content-center gap-1" *ngIf="selectedCountryCode">
+              <img [src]="selectedCountryCode.image" [alt]="selectedCountryCode.name" width="25"/>
+              <div>{{ selectedCountryCode.dial_code }}</div>
+            </div>
+          </ng-template>
+          <ng-template let-country pTemplate="item">
+            <div *ngIf="country.dial_code?.length" class="flex align-items-center gap-2">
+              ({{country.dial_code}}) {{ country.name }}
+            </div>
+          </ng-template>
+        </p-dropdown>
+        <input
+          autocomplete="off"
+          class="p-inputtext-sm"
+          pInputText
+          #phoneInput
+          [(ngModel)]="phoneNumber"
+          (keyup)="handleInputKeyup($event, selectedDefaultSearch.option)"
+          [pKeyFilter]="'int'"
+          [maxLength]="15"
+          [minlength]="7"
+          [minLength]="7"
+          [placeholder]="'header.search' | translate"/>
+      </div>
+      <input
+        autocomplete="off"
+        class="p-inputtext-sm h-2rem name-input"
+        pInputText
+        #nameInput
+        *ngIf="selectedDefaultSearch.option === 'name'"
+        [(ngModel)]="name"
+        (keyup)="handleInputKeyup($event, selectedDefaultSearch.option)"
+        [placeholder]="'header.search_name' | translate"/>
+      <p-calendar *ngIf="selectedDefaultSearch.option === 'date'" [(ngModel)]="date"></p-calendar>
+      <p-dropdown
+        class="p-inputtext-sm search-option"
+        [options]="defaultSearchOptions"
+        [(ngModel)]="selectedDefaultSearch"
+        (onChange)="onSearchOptionChange($event.value)">
+        <ng-template pTemplate="selectedItem">
+          <div class="flex align-items-center gap-1">
+            <i class="pi text-sm" [class]="selectedDefaultSearch.icon"></i>
+          </div>
+        </ng-template>
+        <ng-template let-searchOption pTemplate="item">
+          <div class="flex align-items-center gap-1">
+            <i class="pi text-sm" [class]="searchOption.icon"></i>
+          </div>
+        </ng-template>
+      </p-dropdown>
+      <div *ngIf="showSearchResults"
+           #searchResultsWindow
+           class="bg-gray-800 shadow-8 border-round-xl w-16rem max-h-20rem absolute top-100 text-white-alpha-90 md:text-lg overflow-auto cursor-pointer">
+        <p *ngIf="emptySearchResults(searchResults)" class="m-3 text-center">{{ 'header.no_results' | translate }}</p>
+        <div class="px-2 hover:bg-white-alpha-5" *ngFor="let result of searchResults | keyvalue; last as last" (click)="loadPatient(result.value)">
+            <p class="text-white-alpha-90 mx-2 mt-0 mb-1 pt-3">
+              <i class="pi pi-user text-xs md:text-base mr-1"></i>
+              <span class="mx-1">{{ result.value['firstName'] }}</span>
+              <span>{{ result.value['lastName'] }}</span>
+            </p>
+            <p [class.pb-3]="last" class="text-white-alpha-90 mx-2 my-0 pb-1">
+              <i class="pi pi-phone text-xs md:text-base"></i>
+              <span class="mx-2 text-sm md:text-bae text-white-alpha-80">{{ convertPhoneNumber(result.value['phone']) }}</span>
+            </p>
+          <div *ngIf="!last" class="border-bottom-1 border-white-alpha-10 pt-2"></div>
+        </div>
+      </div>
+      <i (click)="searchBy(selectedDefaultSearch.option)"
+         [class]="isSearchDisabled() ? 'text-white-alpha-30' : 'text-white-alpha-70 hover:text-white-alpha-90 cursor-pointer'"
+         class="pi pi-search font-bold py-3 px-1 mx-1 transition-duration-200">
+      </i>
+      <i (click)="resetSearch()"
+         *ngIf="showResetButton"
+         class="pi pi-refresh font-bold py-3 mr-1 text-white-alpha-70 hover:text-white-alpha-90 cursor-pointer transition-duration-200">
+      </i>
+    </div>
+
+    <div class="md:hidden h-5rem flex justify-content-end align-items-center pt-1">
+      <div (click)="togglePhoneMenu()" class="hamburger" [class.active]="activePhoneMenu">
+        <div class="hamburger-bar border-round-3xl bg-bluegray-600"
+             [@hamburger]="!activePhoneMenu ? 'hamburger' : 'topX'"></div>
+        <div class="hamburger-bar border-round-3xl bg-bluegray-600"
+             [@hamburger]="!activePhoneMenu ? 'hamburger' : 'hide'"></div>
+        <div class="hamburger-bar border-round-3xl bg-bluegray-600"
+             [@hamburger]="!activePhoneMenu ? 'hamburger' : 'bottomX'"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closeOnEscape]="true"
+          [showHeader]="false"
+          [(visible)]="activePhoneMenu">
+  <div class="my-8 pt-5 consolas flex flex-column align-items-center gap-1">
+    <div *ngFor="let option of options" (click)="navigateTo(option.path)"
+         class="p-3 border-round shadow-1 bg-gray-800 flex flex-column justify-content-center align-items-center w-10rem h-10rem gap-3">
+      <i [class]="option.icon" class="text-4xl text-white-alpha-70"></i>
+      <h4 class="m-0 text-white-alpha-70 text-center">
+        {{ option.title }}
+      </h4>
+    </div>
+  </div>
+  <!--  <div class="border-top-1 flex justify-content-center text-white-alpha-70 border-white-alpha-70 mx-7">-->
+  <!--    <img class="logo mt-7" width="125" src="assets/images/dentique-logo.png">-->
+  <!--  </div>-->
+</p-dialog>
+
+<p-toast></p-toast>

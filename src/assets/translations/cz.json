@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Vítejte",
+    "appointments": "Schůzky",
+    "patient_manager": "Správa Pacientů",
+    "settings": "Nastavení",
+    "logout": "Odhlásit se"
+  },
+  "settings": {
+    "doctor_details": "Detaily Lékaře",
+    "name": "Jméno",
+    "address": "Adresa",
+    "company": "Společnost",
+    "CUI": "CUI",
+    "application_settings": "Nastavení Aplikace",
+    "language": "Jazyk",
+    "theme": "Téma"
+  },
+  "appointments": {
+    "patient": "Pacient",
+    "date": "Datum",
+    "cabinet": "Kabinet",
+    "treatment": "Léčba"
+  },
+  "patient_manager": {
+    "allergies": "Alergie",
+    "chronic_diseases": "Chronická Onemocnění",
+    "family_health_history": "Historie Zdraví Rodiny",
+    "tooth_chart": "Zubní Mapa",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Uložit Pacienta"
+  },
+  "form": {
+    "first_name": "Jméno",
+    "last_name": "Příjmení",
+    "phone": "Telefonní Číslo",
+    "PIN": "CNP",
+    "birthday": "Datum Narození",
+    "date": "Datum",
+    "age": "Věk",
+    "email": "Emailová Adresa",
+    "sex": "Pohlaví",
+    "county": "Okres",
+    "town": "Město",
+    "address": "Adresa"
+  },
+  "notifications": {
+    "appointment_created": "Schůzka Vytvořena!",
+    "appointment_deleted": "Schůzka Zrušena!",
+    "appointment_updated": "Schůzka Aktualizována!",
+    "saved": "Uloženo!",
+    "error": "Něco Se Pokazilo!"
+  },
+  "button": {
+    "save": "Uložit",
+    "save_patient": "Uložit Pacienta",
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "login": "Přihlášení",
+    "try_again": "Zkusit znovu"
+  }
+}

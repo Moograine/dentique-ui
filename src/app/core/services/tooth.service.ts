@@ -139,11 +139,17 @@ export class ToothService {
     });
   }
 
+  savePatientToothChart(patientId: number, toothDataCollection: ToothModel[]): Observable<ToothModel[]> {
+    return <Observable<ToothModel[]>>this.http
+      .put(`${Environment.defaultApi}/patients/${patientId}/toothChart.json`, toothDataCollection);
+  }
+
   saveTooth(patientId: number, toothId: number, tooth: ToothModel): Observable<ToothModel> {
     console.log(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}.json`);
     return <Observable<ToothModel>>this.http
       .put(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}.json`, tooth);
   }
+
 
   savePreviousCare(patientId: number, toothId: number, previousCareId: number, previousCare: PreviousCareModel): Observable<PreviousCareModel> {
     console.log(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}/previousCares/${previousCareId}.json`);

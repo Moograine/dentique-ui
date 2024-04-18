@@ -1,0 +1,63 @@
+{
+  "menu": {
+    "welcome": "Bienvenido",
+    "appointments": "Citas",
+    "patient_manager": "Gestión de Pacientes",
+    "settings": "Ajustes",
+    "logout": "Cerrar Sesión"
+  },
+  "settings": {
+    "doctor_details": "Detalles del Médico",
+    "name": "Nombre",
+    "address": "Dirección",
+    "company": "Empresa",
+    "CUI": "CUI",
+    "application_settings": "Ajustes de la Aplicación",
+    "language": "Idioma",
+    "theme": "Tema"
+  },
+  "appointments": {
+    "patient": "Paciente",
+    "date": "Fecha",
+    "cabinet": "Consultorio",
+    "treatment": "Tratamiento"
+  },
+  "patient_manager": {
+    "allergies": "Alergias",
+    "chronic_diseases": "Enfermedades Crónicas",
+    "family_health_history": "Historial de Salud Familiar",
+    "tooth_chart": "Gráfico Dental",
+    "FDI": "FDI",
+    "UNS": "UNS",
+    "save_patient": "Guardar Paciente"
+  },
+  "form": {
+    "first_name": "Nombre",
+    "last_name": "Apellido",
+    "phone": "Número de Teléfono",
+    "PIN": "CNP",
+    "birthday": "Fecha de Nacimiento",
+    "date": "Fecha",
+    "age": "Edad",
+    "email": "Correo Electrónico",
+    "sex": "Género",
+    "county": "Condado",
+    "town": "Ciudad",
+    "address": "Dirección"
+  },
+  "notifications": {
+    "appointment_created": "¡Cita Creada!",
+    "appointment_deleted": "¡Cita Cancelada!",
+    "appointment_updated": "¡Cita Actualizada!",
+    "saved": "¡Guardado!",
+    "error": "¡Algo Salió Mal!"
+  },
+  "button": {
+    "save": "Guardar",
+    "save_patient": "Guardar Paciente",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "login": "Iniciar Sesión",
+    "try_again": "Intentar de Nuevo"
+  }
+}

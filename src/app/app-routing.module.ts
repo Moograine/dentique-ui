@@ -15,12 +15,13 @@ import {
 import { LoginComponent } from './onboarding/login/login.component';
 import { FeaturesComponent } from './features/features.component';
 import { PdfViewerComponent } from './features/patients/patient-manager/pdf-viewer/pdf-viewer/pdf-viewer.component';
+import { SettingsComponent } from './features/settings/settings.component';
 
 const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'patient-manager'
+    redirectTo: 'appointments'
   },
   {
     path: 'login',
@@ -49,6 +50,10 @@ const routes: Routes = [
       {
         path: 'appointment-manager',
         component: AppointmentManagerComponent
+      },
+      {
+        path: 'settings',
+        component: SettingsComponent
       }
     ]
   }

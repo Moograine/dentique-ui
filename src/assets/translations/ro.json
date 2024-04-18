@@ -1,0 +1,89 @@
+{
+  "menu": {
+    "welcome": "Bun venit",
+    "appointments": "Programări",
+    "patient_manager": "Manager Pacienți",
+    "settings": "Setări",
+    "logout": "Deconectare"
+  },
+  "header": {
+    "search": "Căutare",
+    "search_name": "Căutare după nume"
+  },
+  "settings": {
+    "doctor_details": "Detalii Doctor",
+    "name": "Nume",
+    "address": "Adresă",
+    "company": "Companie",
+    "CUI": "CUI",
+    "application_settings": "Setări Aplicație",
+    "language": "Limba",
+    "theme": "Tematică",
+    "tooth_notation": "Notare Diagramă Dentară"
+  },
+  "appointments": {
+    "patient": "Pacient",
+    "date": "Data",
+    "cabinet": "Cabinet",
+    "treatment": "Tratament",
+    "no_appointment": "Nu s-au găsit programări"
+  },
+  "patient_manager": {
+    "allergies": "Alergii",
+    "previous_surgeries": "Intervenții Chirurgicale Anterioare",
+    "chronic_diseases": "Boli Cronice",
+    "family_health_history": "Istoric Medical Familial",
+    "patient_details": {
+      "allergies": "alergii",
+      "allergy": "Alergie",
+      "previous_surgeries": "intervenții chirurgicale anterioare",
+      "operations": "Operații",
+      "chronic_diseases": "boli cronice",
+      "disease": "Boală",
+      "family_health_history": "istoric medical familial",
+      "history": "Istoric",
+      "recorded": "Înregistrat",
+      "no_records": "Nu există înregistrări",
+      "add": "Adaugă"
+    },
+    "x_rays": {
+      "title": "Radiografii",
+      "upload": "Încărcați",
+      "no_x_rays": "Nu există radiografii încărcate"
+    },
+    "tooth_chart": "Diagramă Dentară",
+    "FDI": "FDI",
+    "UNS": "UNS"
+  },
+  "form": {
+    "first_name": "Nume",
+    "last_name": "Nume de Familie",
+    "phone": "Număr de Telefon",
+    "PIN": "CNP",
+    "birthday": "Data Nașterii",
+    "date": "Data",
+    "age": "Vârstă",
+    "email": "Adresă de Email",
+    "sex": "Sex",
+    "county": "Județ",
+    "town": "Oraș",
+    "address": "Adresă",
+    "treatment": "Tratament",
+    "description": "Descriere"
+  },
+  "notifications": {
+    "appointment_created": "Programare Creată!",
+    "appointment_deleted": "Programare Anulată!",
+    "appointment_updated": "Programare Actualizată!",
+    "saved": "Salvat!",
+    "error": "Ceva A Mers Greșit!"
+  },
+  "button": {
+    "save": "Salvează",
+    "save_patient": "Salvează Pacient",
+    "cancel": "Anulează",
+    "close": "Închide",
+    "login": "Conectare",
+    "try_again": "Încearcă Din Nou"
+  }
+}
