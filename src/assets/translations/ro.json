@@ -1,38 +1,69 @@
 {
   "menu": {
-    "welcome": "Bun venit",
+    "welcome": "Bine ați venit",
     "appointments": "Programări",
-    "patient_manager": "Manager Pacienți",
+    "patient_manager": "Manager pacienți",
     "settings": "Setări",
     "logout": "Deconectare"
   },
   "header": {
     "search": "Căutare",
-    "search_name": "Căutare după nume"
+    "search_name": "Căutare după nume",
+    "no_results": "Nu s-au găsit rezultate."
   },
   "settings": {
-    "doctor_details": "Detalii Doctor",
+    "doctor_details": "Detalii doctor",
     "name": "Nume",
     "address": "Adresă",
     "company": "Companie",
     "CUI": "CUI",
-    "application_settings": "Setări Aplicație",
-    "language": "Limba",
-    "theme": "Tematică",
-    "tooth_notation": "Notare Diagramă Dentară"
+    "application_settings": "Setări aplicație",
+    "language": "Limbă",
+    "theme": "Temă",
+    "tooth_notation": "Notație diagramă dinți",
+    "currency": {
+      "eur": "Euro",
+      "usd": "Dolar american",
+      "huf": "Forint",
+      "ron": "Leu românesc",
+      "rsd": "Dinar sârbesc",
+      "uah": "Hrivnă ucraineană",
+      "czk": "Coroană cehă",
+      "pln": "Zlot polonez"
+    }
   },
   "appointments": {
     "patient": "Pacient",
-    "date": "Data",
+    "appointment": "Programare",
+    "date": "Dată",
     "cabinet": "Cabinet",
     "treatment": "Tratament",
-    "no_appointment": "Nu s-au găsit programări"
+    "no_appointment": "Nu s-a găsit nicio programare",
+    "conflict_dialog": {
+      "title": "Conflict",
+      "already_registered": "Un pacient este deja înregistrat cu acest număr de telefon:",
+      "no_match": "Totuși, numele pe care l-ați introdus pentru programare nu se potrivește cu numele pacientului înregistrat:",
+      "appointment_name": "Nume în programare:",
+      "original_name": "Nume original:",
+      "modify": "Modifică:",
+      "tooltip": "Faceți clic pe Programare și numele introdus în formularul de programare va fi înlocuit cu numele din formularul pacientului înregistrat.\nFaceți clic pe Pacient, iar programarea va fi salvată așa cum este, iar formularul pacientului va fi actualizat în fundal cu numele modificat."
+    },
+    "days": {
+      "monday": "Luni",
+      "tuesday": "Marți",
+      "wednesday": "Miercuri",
+      "thursday": "Joi",
+      "friday": "Vineri",
+      "saturday": "Sâmbătă",
+      "sunday": "Duminică"
+    }
   },
   "patient_manager": {
     "allergies": "Alergii",
-    "previous_surgeries": "Intervenții Chirurgicale Anterioare",
-    "chronic_diseases": "Boli Cronice",
-    "family_health_history": "Istoric Medical Familial",
+    "previous_surgeries": "Intervenții chirurgicale anterioare",
+    "chronic_diseases": "Boli cronice",
+    "family_health_history": "Istoric medical familial",
+    "no_records": "Niciun înregistrare",
     "patient_details": {
       "allergies": "alergii",
       "allergy": "Alergie",
@@ -48,22 +79,26 @@
     },
     "x_rays": {
       "title": "Radiografii",
-      "upload": "Încărcați",
-      "no_x_rays": "Nu există radiografii încărcate"
+      "upload": "Încarcă",
+      "no_x_rays": "Nu există radiografii încărcate încă"
     },
-    "tooth_chart": "Diagramă Dentară",
+    "tooth_chart": "Diagramă dinți",
+    "tooth_status": "Starea dinților:",
+    "intact": "Intact",
+    "missing": "Extras",
+    "implant": "Implant",
     "FDI": "FDI",
     "UNS": "UNS"
   },
   "form": {
     "first_name": "Nume",
-    "last_name": "Nume de Familie",
-    "phone": "Număr de Telefon",
+    "last_name": "Prenume",
+    "phone": "Număr de telefon",
     "PIN": "CNP",
-    "birthday": "Data Nașterii",
-    "date": "Data",
+    "birthday": "Data nașterii",
+    "date": "Dată",
     "age": "Vârstă",
-    "email": "Adresă de Email",
+    "email": "Adresă de email",
     "sex": "Sex",
     "county": "Județ",
     "town": "Oraș",
@@ -72,18 +107,104 @@
     "description": "Descriere"
   },
   "notifications": {
-    "appointment_created": "Programare Creată!",
-    "appointment_deleted": "Programare Anulată!",
-    "appointment_updated": "Programare Actualizată!",
-    "saved": "Salvat!",
-    "error": "Ceva A Mers Greșit!"
+    "appointment_created": "Programare creată!",
+    "appointment_deleted": "Programare anulată!",
+    "appointment_updated": "Programare actualizată!",
+    "patient_saved": "Pacient salvat.",
+    "patient_not_registered": "Pacientul nu este înregistrat!",
+    "patient_already_registered": "Acest număr de telefon este deja înregistrat pentru acest pacient:",
+    "patient_corrupted": "Datele pacientului sunt corupte!",
+    "patient_invalid_form": "Vă rugăm să introduceți mai întâi detaliile pacientului!",
+    "previous_care_deleted": "Tratament anterior șters.",
+    "larger_than_5MB": "Nu poate fi mai mare de 5MB!",
+    "acceptable_file_formats": "Acceptăm doar .png sau .jpg sau .jpeg!",
+    "invalid_form": "Formularul este invalid.",
+    "invalid": "Invalid",
+    "error": "Eroare",
+    "success": "Succes",
+    "cannot_save": "Nu se poate salva",
+    "not_found": "Nu a fost găsit",
+    "saved": "Salvat.",
+    "uploaded": "Încărcat.",
+    "deleted": "Șters.",
+    "generic_error": "A apărut o eroare!"
   },
   "button": {
     "save": "Salvează",
-    "save_patient": "Salvează Pacient",
+    "save_patient": "Salvează pacientul",
     "cancel": "Anulează",
     "close": "Închide",
-    "login": "Conectare",
-    "try_again": "Încearcă Din Nou"
+    "override": "Suprascrie",
+    "login": "Autentificare",
+    "try_again": "Încearcă din nou"
+  },
+  "primeng": {
+    "dayNames": [
+      "Duminică",
+      "Luni",
+      "Marți",
+      "Miercuri",
+      "Joi",
+      "Vineri",
+      "Sâmbătă"
+    ],
+    "dayNamesShort": [
+      "Dum",
+      "Lun",
+      "Mar",
+      "Mie",
+      "Joi",
+      "Vin",
+      "Sâm"
+    ],
+    "dayNamesMin": [
+      "Du",
+      "Lu",
+      "Ma",
+      "Mi",
+      "Jo",
+      "Vi",
+      "Sâ"
+    ],
+    "monthNames": [
+      "Ianuarie",
+      "Februarie",
+      "Martie",
+      "Aprilie",
+      "Mai",
+      "Iunie",
+      "Iulie",
+      "August",
+      "Septembrie",
+      "Octombrie",
+      "Noiembrie",
+      "Decembrie"
+    ],
+    "monthNamesShort": [
+      "Ian",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mai",
+      "Iun",
+      "Iul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Noi",
+      "Dec"
+    ],
+    "today": "Astăzi",
+    "weekHeader": "Săpt"
+  },
+  "pdf_viewer": {
+    "invoice": "Factură Nr.",
+    "amount": "Sumă",
+    "date": "Dată",
+    "description": "Descriere",
+    "quantity": "Cantitate",
+    "total": "Total",
+    "top": "sus",
+    "bottom": "jos"
   }
 }

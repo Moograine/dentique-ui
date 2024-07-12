@@ -1,0 +1,201 @@
+<div class="mx-3 px-1 mt-3">
+  <i (click)="navigateBackToSettings()" class="pi pi-arrow-left text-white-alpha-80 hover:text-white transition-duration-200 cursor-pointer"></i>
+</div>
+
+<div class="flex justify-content-center align-items-center relative px-2 sm:px-0">
+  <div class="border-round-xl border-1 border-bluegray-700 p-2 md:p-3 m-3 lg:mx-4 w-full">
+    <p *ngIf="!tableItems.length" class="mx-3">{{ 'settings.no_services_found' | translate }}</p>
+    <div class="table-container">
+      <p-table *ngIf="tableItems.length" selectionMode="single" styleClass="p-datatable-striped" [value]="tableItems">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="id">{{ 'settings.id' | translate }}</th>
+            <th pSortableColumn="label">{{ 'settings.name' | translate }}</th>
+            <th pSortableColumn="price">{{ 'settings.price' | translate }}</th>
+            <th>Action</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-service let-rowIndex="rowIndex">
+          <tr>
+            <td>{{ service.id !== -1 ? service.id : '-' }}</td>
+            <td>
+              <div *ngIf="service.custom" class="flex gap-1">
+                <span>{{ service.label }}</span>
+                <i
+                  class="pi pi-info-circle text-xs text-white-alpha-70 hover:text-white transition-duration-200 outline-none"
+                  #tooltip
+                  [tooltipEvent]="'focus'"
+                  [tooltipPosition]="'top'"
+                  [tabindex]="0"
+                  (mouseover)="showTooltip($event, tooltip)"
+                  (mouseleave)="hideTooltip($event, tooltip)"
+                  (click)="showTooltip($event, tooltip)"
+                  [pTooltip]="'settings.custom_service_tooltip' | translate">
+                </i>
+              </div>
+              <span *ngIf="!service.custom">{{ 'services_list.' + service.label | translate }}</span>
+            </td>
+            <td class="text-blue-600 font-bold">
+              <span *ngIf="!service.editing">{{ service.price | customCurrency }}</span>
+              <input
+                *ngIf="service.editing"
+                (keyup.enter)="finishEditing(service, rowIndex)"
+                (keyup.escape)="abortEditing()"
+                pAutoFocus
+                [autofocus]="true"
+                [(ngModel)]="service.price"
+                [pKeyFilter]="'num'"
+                pInputText
+                class="p-inputtext py-2 px-2 max-w-min min-w-fit"/>
+            </td>
+            <td *ngIf="!service.editing">
+              <div class="flex">
+                <button (click)="editServiceTableItem(service, rowIndex)" class="p-button cancel">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button
+                  (click)="displayConfirmDialog(rowIndex)"
+                  pRipple
+                  class="p-button bg-red-600 hover:bg-red-400 border-1 border-solid
+              border-red-600 mx-2 hover:border-red-400 hover:text-white">
+                  <i class="pi pi-trash text-white-alpha-70"></i>
+                </button>
+              </div>
+            </td>
+            <td *ngIf="service.editing">
+              <div class="flex">
+                <button (click)="abortEditing()" class="p-button cancel">
+                  <i class="pi pi-times"></i>
+                </button>
+                <button
+                  (click)="finishEditing(service, rowIndex)"
+                  pRipple
+                  class="p-button bg-green-800 hover:bg-green-700 border-1 border-solid
+              border-green-800 mx-2 hover:border-green-700 hover:text-white">
+                  <i class="pi pi-check text-white-alpha-70"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+<div class="flex justify-content-end mx-4 mb-3 gap-2">
+  <button (click)="displayCustomServiceDialog()" pRipple class="p-button cancel">{{ 'button.custom' | translate }}</button>
+  <button (click)="displayAllServicesDialog()" pRipple class="p-button">{{ 'button.add' | translate }}</button>
+</div>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [closeOnEscape]="true"
+          [closable]="true"
+          [showHeader]="false"
+          class="no-header min-w-75vw"
+          [(visible)]="showConfirmDialog">
+  <h3 class="text-center m-4">{{ 'appointments.are_you_sure' | translate }}</h3>
+  <div class="flex justify-content-center">
+    <button (click)="closeConfirmDialog()"
+            class="p-button bg-red-800 hover:bg-red-700 border-red-700 mx-2">
+      <i class="pi pi-times text-white-alpha-90"></i>
+    </button>
+    <button (click)="deleteServiceTableItem(editedTableItemIndex)"
+            class="p-button bg-green-800 hover:bg-green-700 border-green-700 mx-2">
+      <i class="pi pi-check text-white-alpha-90"></i>
+    </button>
+  </div>
+</p-dialog>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [closeOnEscape]="true"
+          [closable]="true"
+          (onShow)="focusNextInput(labelInput)"
+          [(visible)]="showCustomServiceDialog">
+  <div (keyup.control.enter)="saveCustomService()" class="w-75vw sm:w-17rem">
+    <p class="m-1 text-sm text-white-alpha-70">{{ 'form.label' | translate }}:</p>
+    <input (keyup.enter)="focusNextInput(IDInput)" #labelInput pInputText [(ngModel)]="newCustomService.label"/>
+    <div class="grid grid-nogutter mt-1">
+      <div class="col-6 pr-1">
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'form.id' | translate }}:</p>
+        <input #IDInput (keyup.enter)="focusNextInput(priceInput)" pInputText [(ngModel)]="newCustomService.id"/>
+      </div>
+      <div class="col-6 pl-1">
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'form.price' | translate }}:</p>
+        <input
+          #priceInput
+          [(ngModel)]="newCustomService.price"
+          pInputText
+          [pKeyFilter]="'num'"/>
+      </div>
+    </div>
+    <div class="flex justify-content-between align-items-center mt-5">
+      <i class="pi pi-question-circle mx-1 text-bluegray-700 hover:text-bluegray-600 transition-duration-200 outline-none"
+         #tooltip
+         [tooltipEvent]="'focus'"
+         [tabindex]="0"
+         (mouseover)="showTooltip($event, tooltip)"
+         (mouseleave)="hideTooltip($event, tooltip)"
+         (click)="showTooltip($event, tooltip)"
+         [pTooltip]="'settings.custom_service_dialog_tooltip' | translate">
+      </i>
+      <div class="flex gap-2">
+        <button (click)="closeCustomServiceDialog()" class="p-button cancel">
+          {{ 'button.cancel' | translate }}
+        </button>
+        <button
+          [disabled]="newCustomService.label.length < 3"
+          [pTooltip]="'notifications.label_minimum_3_characters' | translate"
+          [tooltipDisabled]="newCustomService.label.length > 2"
+          (click)="saveCustomService()"
+          class="p-button">
+          {{ 'button.save' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [modal]="true"
+          [dismissableMask]="true"
+          [resizable]="false"
+          [closeOnEscape]="true"
+          [closable]="true"
+          (onHide)="resetServiceListToOriginal()"
+          [(visible)]="showAllServicesDialog">
+  <h4 class="mt-0 mb-2">{{ 'settings.available_services' | translate }}</h4>
+  <div class="relative mb-2">
+    <input (ngModelChange)="filterServiceList($event)" [placeholder]="'header.search' | translate" pInputText [(ngModel)]="searchInput" class="pr-5"/>
+    <i
+      (click)="clearSearchInput()"
+      [class]="!searchInput.length ? 'opacity-0' : 'cursor-pointer'"
+      class="pi pi-times text-white-alpha-80 hover:text-white transition-duration-200 absolute right-0 py-3 px-2 mx-1">
+    </i>
+  </div>
+  <div class="max-h-20rem sm:max-h-25rem sm:w-30rem overflow-y-auto pr-1">
+    <p *ngIf="!displayedServiceList.length">{{ 'settings.no_services_found' | translate }}</p>
+    <div *ngFor="let serviceGroup of displayedServiceList">
+      <h4 class="p-orderlist-title">{{ 'services_list.' + serviceGroup.label | translate }}</h4>
+      <div *ngFor="let service of serviceGroup.services"
+           class="bg-white-alpha-5 my-1 flex gap-2 justify-content-between align-items-center border-round-sm shadow-2 p-3">
+        <span>{{ 'services_list.' + service.label | translate }}</span>
+        <p-checkbox [binary]="true" [id]="service.label" [name]="service.label" [(ngModel)]="service.available"></p-checkbox>
+      </div>
+    </div>
+  </div>
+  <div class="flex justify-content-end mt-2 gap-2">
+    <button (click)="closeAllServicesDialog()" class="p-button cancel">
+      {{ 'button.cancel' | translate }}
+    </button>
+    <button
+      (click)="updateAvailableServices()"
+      class="p-button">
+      {{ 'button.save' | translate }}
+    </button>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

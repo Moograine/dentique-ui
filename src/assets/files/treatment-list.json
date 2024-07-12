@@ -1,0 +1,355 @@
+[
+  {
+    "label": "general_and_preventive_services",
+    "services": [
+      {
+        "label": "initial_oral_examination"
+      },
+      {
+        "label": "routine_dental_check_up"
+      },
+      {
+        "label": "digital_x_rays"
+      },
+      {
+        "label": "panoramic_x_rays"
+      },
+      {
+        "label": "dental_cleanings_prophylaxis"
+      },
+      {
+        "label": "fluoride_treatments"
+      },
+      {
+        "label": "sealants"
+      },
+      {
+        "label": "oral_cancer_screening"
+      },
+      {
+        "label": "periodontal_gum_evaluation"
+      },
+      {
+        "label": "bite_analysis"
+      },
+      {
+        "label": "night_guards"
+      },
+      {
+        "label": "sports_mouth_guards"
+      },
+      {
+        "label": "nutritional_counseling_for_oral_health"
+      },
+      {
+        "label": "patient_education_and_home_care_instructions"
+      }
+    ]
+  },
+  {
+    "label": "restorative_services",
+    "services": [
+      {
+        "label": "composite_tooth_colored_fillings"
+      },
+      {
+        "label": "amalgam_silver_fillings"
+      },
+      {
+        "label": "inlays_and_onlays"
+      },
+      {
+        "label": "dental_crowns"
+      },
+      {
+        "label": "dental_bridges"
+      },
+      {
+        "label": "dentures_complete_and_partial"
+      },
+      {
+        "label": "dental_implants"
+      },
+      {
+        "label": "implant_supported_dentures"
+      },
+      {
+        "label": "implant_crowns_and_bridges"
+      },
+      {
+        "label": "root_canal_therapy"
+      },
+      {
+        "label": "endodontic_retreatment"
+      },
+      {
+        "label": "post_and_core_build_up"
+      },
+      {
+        "label": "tooth_extractions"
+      },
+      {
+        "label": "socket_preservation"
+      },
+      {
+        "label": "bone_grafting"
+      },
+      {
+        "label": "repair_of_dentures_or_partials"
+      },
+      {
+        "label": "temporary_restorations"
+      }
+    ]
+  },
+  {
+    "label": "cosmetic_services",
+    "services": [
+      {
+        "label": "teeth_whitening"
+      },
+      {
+        "label": "veneers"
+      },
+      {
+        "label": "bonding"
+      },
+      {
+        "label": "cosmetic_contouring"
+      },
+      {
+        "label": "enamel_shaping"
+      },
+      {
+        "label": "smile_makeovers"
+      },
+      {
+        "label": "gum_contouring"
+      },
+      {
+        "label": "invisalign_or_clear_aligners"
+      },
+      {
+        "label": "cosmetic_crowns"
+      },
+      {
+        "label": "tooth_jewelry"
+      }
+    ]
+  },
+  {
+    "label": "orthodontic_services",
+    "services": [
+      {
+        "label": "traditional_braces"
+      },
+      {
+        "label": "ceramic_braces"
+      },
+      {
+        "label": "lingual_braces"
+      },
+      {
+        "label": "clear_aligners"
+      },
+      {
+        "label": "space_maintainers"
+      },
+      {
+        "label": "retainers"
+      },
+      {
+        "label": "orthodontic_consultations"
+      },
+      {
+        "label": "orthodontic_adjustments"
+      },
+      {
+        "label": "early_orthodontic_treatment_interceptive"
+      },
+      {
+        "label": "adult_orthodontic_treatment"
+      }
+    ]
+  },
+  {
+    "label": "periodontal_gum_services",
+    "services": [
+      {
+        "label": "scaling_and_root_planing_deep_cleaning"
+      },
+      {
+        "label": "periodontal_maintenance"
+      },
+      {
+        "label": "gingival_flap_surgery"
+      },
+      {
+        "label": "soft_tissue_grafts"
+      },
+      {
+        "label": "osseous_surgery"
+      },
+      {
+        "label": "bone_grafts_for_periodontal_disease"
+      },
+      {
+        "label": "crown_lengthening"
+      },
+      {
+        "label": "periodontal_laser_therapy"
+      },
+      {
+        "label": "antibiotic_therapy_for_gum_disease"
+      }
+    ]
+  },
+  {
+    "label": "oral_surgery",
+    "services": [
+      {
+        "label": "tooth_extractions_simple_and_surgical"
+      },
+      {
+        "label": "wisdom_teeth_removal"
+      },
+      {
+        "label": "dental_implants_placement"
+      },
+      {
+        "label": "biopsies_of_oral_lesions"
+      },
+      {
+        "label": "frenectomy_tongue_tie_or_lip_tie_surgery"
+      },
+      {
+        "label": "apicoectomy_root_end_surgery"
+      },
+      {
+        "label": "oral_pathology_and_diagnosis"
+      },
+      {
+        "label": "tmj_tmd_treatment"
+      },
+      {
+        "label": "orthognathic_surgery_corrective_jaw_surgery"
+      },
+      {
+        "label": "cyst_or_tumor_removal"
+      },
+      {
+        "label": "sinus_lift"
+      }
+    ]
+  },
+  {
+    "label": "pediatric_dental_services",
+    "services": [
+      {
+        "label": "pediatric_dental_exams"
+      },
+      {
+        "label": "pediatric_cleanings"
+      },
+      {
+        "label": "fluoride_treatments_for_children"
+      },
+      {
+        "label": "sealants_for_children"
+      },
+      {
+        "label": "pulpotomies_pediatric_root_canals"
+      },
+      {
+        "label": "space_maintainers"
+      },
+      {
+        "label": "behavior_management_techniques"
+      },
+      {
+        "label": "interceptive_orthodontics"
+      },
+      {
+        "label": "silver_diamine_fluoride_treatment"
+      },
+      {
+        "label": "preventive_resin_restorations"
+      },
+      {
+        "label": "emergency_pediatric_dental_care"
+      }
+    ]
+  },
+  {
+    "label": "emergency_dental_services",
+    "services": [
+      {
+        "label": "emergency_examination"
+      },
+      {
+        "label": "pain_management"
+      },
+      {
+        "label": "abscess_drainage"
+      },
+      {
+        "label": "temporary_fillings_or_crowns"
+      },
+      {
+        "label": "emergency_tooth_extraction"
+      },
+      {
+        "label": "trauma_management_chipped_or_knocked_out_teeth"
+      },
+      {
+        "label": "management_of_dental_infections"
+      }
+    ]
+  },
+  {
+    "label": "diagnostic_services",
+    "services": [
+      {
+        "label": "comprehensive_oral_exam"
+      },
+      {
+        "label": "limited_oral_exam_problem_focused"
+      },
+      {
+        "label": "radiographic_examination"
+      },
+      {
+        "label": "cbct_cone_beam_ct_scans"
+      },
+      {
+        "label": "diagnostic_models_impressions"
+      },
+      {
+        "label": "salivary_diagnostics"
+      },
+      {
+        "label": "bacterial_testing"
+      }
+    ]
+  },
+  {
+    "label": "additional_services",
+    "services": [
+      {
+        "label": "sedation_dentistry_nitrous_oxide_oral_sedation_iv_sedation"
+      },
+      {
+        "label": "anxiety_management_techniques"
+      },
+      {
+        "label": "sleep_apnea_appliances"
+      },
+      {
+        "label": "habit_appliances_thumb_sucking_etc"
+      },
+      {
+        "label": "implant_maintenance"
+      }
+    ]
+  }
+]

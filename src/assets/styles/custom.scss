@@ -7,11 +7,11 @@
     border-color: $secondary;
 
     &:focus {
-      box-shadow: 0 0 3px 0 $input-focus;
+      box-shadow: 0 0 .2rem 0 $input-focus;
     }
 
     &:hover {
-      border: 1px solid $secondary-hover;
+      border: .1rem solid $secondary-hover;
     }
 
     &:-webkit-autofill {
@@ -33,6 +33,23 @@
 
     > label {
       margin-bottom: .25rem;
+    }
+  }
+
+  .month-picker {
+    .p-inputtext {
+      padding: 0.25rem 0.8rem;
+      text-align: center;
+    }
+
+    .p-datepicker {
+      &-decade {
+        white-space: nowrap;
+      }
+
+      &-monthpicker {
+        min-width: 15rem;
+      }
     }
   }
 
@@ -71,6 +88,18 @@
     }
   }
 
+  .p-menu.p-menu-overlay {
+    background: $primary;
+    top: -11.25rem !important;
+    left: .85rem !important;
+    border: none;
+
+    .p-submenu-header {
+      background: $primary;
+      padding: .5rem 1.25rem;
+    }
+  }
+
   .p-dropdown {
     width: 100%;
     border: .1rem solid $secondary;
@@ -99,7 +128,7 @@
 
         .p-dropdown-filter-container {
           .p-inputtext {
-            border: none;
+            box-shadow: none;
           }
         }
       }
@@ -114,7 +143,15 @@
     }
 
     &:not(.p-disabled).p-focus {
-      box-shadow: 0 0 3px 0 $input-focus;
+      box-shadow: 0 0 .2rem 0 $input-focus;
+    }
+
+    &.dialog-dropdown {
+      .p-dropdown-panel {
+        @media(max-width: 575px) {
+          width: 75vw;
+        }
+      }
     }
   }
 
@@ -253,7 +290,6 @@
     }
 
     .p-inputtext {
-      //padding: .5rem;
 
       input {
         font-size: 1.25rem;
@@ -282,6 +318,7 @@
   }
 
   /* Customized style for PrimeNG Dialog */
+
   .p-dialog {
     margin: .25rem;
     border: none;
@@ -299,6 +336,46 @@
 
     &-mask {
       z-index: 5;
+
+      @media(max-height: 512px) {
+        overflow-y: auto;
+      }
+    }
+  }
+
+  .no-header .p-dialog-content {
+    width: 75vw;
+    border-radius: .375rem;
+
+    @media(min-width: 576px) {
+      width: 20rem;
+    }
+  }
+
+  .pdf-dialog .p-dialog {
+    max-height: 100vh;
+
+    .p-dialog-content {
+      border-radius: .375rem;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    @media(max-width: 992px) {
+      transform: scale(.75);
+    }
+
+    @media(max-width: 767px) {
+      transform: scale(.75);
+    }
+
+    @media(max-width: 576px) {
+      transform: scale(.5);
+    }
+
+    @media(max-width: 350px) {
+      transform: scale(.4);
     }
   }
 
@@ -309,6 +386,110 @@
     .p-galleria-item-nav {
       margin-top: -1.75rem;
     }
+  }
+
+  /* Customized style for PrimeNG Checkbox */
+  .p-checkbox {
+    .p-checkbox-box {
+      border: .15rem solid $checkbox-border;
+
+      &.p-highlight {
+        background: $checkbox-checked;
+        border-color: $checkbox-checked;
+
+        &:hover {
+          background: $checkbox-checked-hover;
+          border-color: $checkbox-checked-hover;
+        }
+      }
+
+      &.p-focus {
+        box-shadow: none;
+
+        &:not(.p-highlight) {
+          border-color: $checkbox-border;
+        }
+
+        &:hover {
+          border-color: $checkbox-checked-hover;
+        }
+      }
+
+      &:hover {
+        border-color: $checkbox-checked-hover;
+      }
+    }
+  }
+
+  /* Customized style for PrimeNG Table */
+  .p-datatable {
+    border-color: white;
+
+    .p-datatable-thead > tr > th {
+      background-color: #1d2530;
+      border-color: #5d798f;
+    }
+
+    .p-datatable-tbody > tr > td {
+      background-color: #1d2530;
+      border-color: #5d798f;
+    }
+
+    &.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+      td {
+        background-color: #232d3a;
+      }
+    }
+  }
+
+  /* Customized style for PrimeNG Table */
+  .p-listbox {
+    background: $primary;
+    border: none;
+
+    &-dialog {
+      .p-listbox-header {
+        padding: 0;
+        margin: .25rem 0;
+      }
+
+      .p-listbox-list {
+        max-height: 15rem;
+        padding: 0;
+
+        li {
+          padding: .75rem;
+          border-top: .1rem solid $white-transparent;
+
+          span {
+            width: 100%;
+            word-wrap: break-word;
+          }
+
+          &:first-child {
+            border-color: transparent;
+          }
+        }
+      }
+    }
+  }
+
+  /* Custom classes */
+
+  .cursor-default {
+    cursor: default;
+  }
+
+  .line-height-0 {
+    line-height: .9;
+  }
+
+  .min-w-fit {
+    min-width: fit-content;
+  }
+
+  .w-70vw {
+    width: 70vw;
   }
 
   .w-75vw {
@@ -339,6 +520,10 @@
     border-color: $secondary-hover;
   }
 
+  .bg-white-alpha-5 {
+    background-color: $white-transparent;
+  }
+
   .hover\:bg-white-alpha-5:hover {
     background-color: $white-ultra-transparent;
   }
@@ -351,19 +536,42 @@
 ::ng-deep {
   /* Customized style for PrimeNG Tooltip */
   .p-tooltip {
-    margin-left: .25rem;
-    width: auto;
-    max-width: initial;
+    //width: auto;
+    //max-width: initial;
 
     .p-tooltip-text {
       background-color: $tooltip-blue;
       color: $white-silver;
-      min-width: 14rem;
-      max-width: 20rem;
+      //min-width: 14rem;
+      //max-width: 20rem;
     }
 
-    .p-tooltip-arrow {
+    &-right .p-tooltip-arrow {
       border-right-color: $tooltip-blue !important;
+    }
+
+    &-right {
+      margin-left: .25rem;
+      width: auto;
+
+      @media(min-width: 325px) {
+        max-width: initial;
+      }
+
+      .p-tooltip-text {
+        min-width: 14rem;
+        max-width: 20rem;
+      }
+    }
+
+    &-top {
+      margin-top: -.325rem;
+      //margin-left: -.515rem;
+
+      .p-tooltip-arrow {
+        //margin-left: .25rem;
+        border-top-color: $tooltip-blue !important;
+      }
     }
   }
 }

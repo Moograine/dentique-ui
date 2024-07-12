@@ -1,0 +1,36 @@
+@import 'src/assets/styles/variables';
+
+// TODO duplicate
+.typewriter {
+  transform: translateY(-100%);
+  opacity: 1;
+  border: none;
+  max-width: fit-content;
+  border-right: .15rem solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  animation: typewriter 2.5s steps(44) 1s 1 normal both,
+  blinkTextCursor 500ms steps(40) .75s 8;
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blinkTextCursor {
+  from,
+  to {
+    border-color: transparent
+  }
+  0% {
+    border-color: $text-white-gray;
+  }
+}

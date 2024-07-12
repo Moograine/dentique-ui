@@ -20,7 +20,7 @@ import { OrderListModule } from 'primeng/orderlist';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToothViewerComponent } from './features/patients/patient-manager/tooth-viewer/tooth-viewer/tooth-viewer.component';
-import { PdfViewerComponent } from './features/patients/patient-manager/pdf-viewer/pdf-viewer/pdf-viewer.component';
+import { PdfViewerComponent } from './features/patients/patient-manager/document-builder/pdf-viewer/pdf-viewer.component';
 import { OfflineComponent } from './onboarding/offline/offline.component';
 import { ToastModule } from 'primeng/toast';
 import { RippleModule } from 'primeng/ripple';
@@ -37,6 +37,18 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { AngularFireModule } from '@angular/fire/compat';
 import { FirebaseConfig } from './core/environments/environment';
 import { FileUploadModule } from 'primeng/fileupload';
+import { MenuModule } from 'primeng/menu';
+import { InvoiceViewerComponent } from './features/patients/patient-manager/document-builder/pdf-viewer/invoice-viewer/invoice-viewer.component';
+import { ReceiptViewerComponent } from './features/patients/patient-manager/document-builder/pdf-viewer/receipt-viewer/receipt-viewer.component';
+import { DatasheetViewerComponent } from './features/patients/patient-manager/document-builder/pdf-viewer/datasheet-viewer/datasheet-viewer.component';
+import { DocumentBuilderComponent } from './features/patients/patient-manager/document-builder/document-builder.component';
+import { ServicesTableComponent } from './features/settings/services-table/services-table.component';
+import { TableModule } from 'primeng/table';
+import { CheckboxModule } from 'primeng/checkbox';
+import { AutoFocusModule } from 'primeng/autofocus';
+import { PatientListComponent } from './features/patients/patient-list/patient-list.component';
+import { CustomCurrencyPipe } from './core/pipes/custom-currency.pipe';
+import { ListboxModule } from 'primeng/listbox';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/translations/', '.json');
@@ -58,7 +70,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     OfflineComponent,
     SettingsComponent,
     XRayViewerComponent,
-    PatientDetailsComponent
+    PatientDetailsComponent,
+    InvoiceViewerComponent,
+    ReceiptViewerComponent,
+    DatasheetViewerComponent,
+    DocumentBuilderComponent,
+    ServicesTableComponent,
+    PatientListComponent,
+    CustomCurrencyPipe
   ],
   imports: [
     BrowserModule,
@@ -76,6 +95,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ToastModule,
     RippleModule,
     GalleriaModule,
+    MenuModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -88,7 +108,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     TooltipModule,
     FileUploadModule,
     AngularFireModule.initializeApp(FirebaseConfig),
-    AngularFireStorageModule
+    AngularFireStorageModule,
+    TableModule,
+    CheckboxModule,
+    AutoFocusModule,
+    ListboxModule
   ],
   providers: [],
   bootstrap: [AppComponent]

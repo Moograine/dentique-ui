@@ -11,7 +11,7 @@ export class InternetConnectionService {
   constructor(private http: HttpClient) {}
 
   checkInternetConnection(): Observable<boolean> {
-    return <Observable<boolean>>this.http.get(`${Environment.defaultApi}/patients.json`).pipe(
+    return <Observable<boolean>>this.http.get(`${Environment.defaultAPI}/patients.json`).pipe(
       map(() => true),
       catchError(() => of(false))
     );

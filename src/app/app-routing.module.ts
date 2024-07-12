@@ -14,8 +14,11 @@ import {
 } from './features/appointments/appointment-manager/appointment-manager.component';
 import { LoginComponent } from './onboarding/login/login.component';
 import { FeaturesComponent } from './features/features.component';
-import { PdfViewerComponent } from './features/patients/patient-manager/pdf-viewer/pdf-viewer/pdf-viewer.component';
+import { PdfViewerComponent } from './features/patients/patient-manager/document-builder/pdf-viewer/pdf-viewer.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { ServicesTableComponent } from './features/settings/services-table/services-table.component';
+import { PatientListComponent } from './features/patients/patient-list/patient-list.component';
+import { ServicesListGuard } from './core/guards/services-list-redirect.guard';
 
 const routes: Routes = [
   {
@@ -40,6 +43,10 @@ const routes: Routes = [
         component: PatientManagerComponent,
       },
       {
+        path: 'patient-list',
+        component: PatientListComponent,
+      },
+      {
         path: 'pdf',
         component: PdfViewerComponent
       },
@@ -54,6 +61,11 @@ const routes: Routes = [
       {
         path: 'settings',
         component: SettingsComponent
+      },
+      {
+        path: 'services-table',
+        component: ServicesTableComponent,
+        canActivate: [ServicesListGuard]
       }
     ]
   }

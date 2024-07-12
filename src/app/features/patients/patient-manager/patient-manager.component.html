@@ -1,6 +1,6 @@
 <form [formGroup]="patientFormGroup"
       (keydown.control.shift.enter)="savePatient()"
-      class="p-2 md:p-3 manager-container md:overflow-auto text-white-alpha-80">
+      class="p-2 md:p-3 manager-container flex flex-column justify-content-between md:overflow-auto text-white-alpha-80">
   <!--  Main Container-->
   <div class="grid flex-column xl:flex-row gap-2">
     <!--    1st Column-->
@@ -94,8 +94,8 @@
               pKeyFilter="int"
               formControlName="PIN"
               [placeholder]="'5001212121234'"
-              (ngModelChange)="calculateBirthday(PINInput.value)"
-              (keyup.enter)="filterNextInput(emailInput)"
+              (ngModelChange)="processPIN(PINInput.value)"
+              (keyup.enter)="filterNextInput('PIN', emailInput)"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@
               pInputText
               pKeyFilter="int"
               formControlName="age"
-              [placeholder]="'Age'"
+              [placeholder]="'50'"
               (keyup.enter)="focusNextInput(emailInput)"
             />
           </div>
@@ -140,7 +140,7 @@
               pInputText
               [placeholder]="'johndoe@email.com'"
               formControlName="email"
-              (keyup.enter)="focusNextInput(countyInput)"
+              (keyup.enter)="filterNextInput('email', countyInput)"
             />
           </div>
         </div>
@@ -150,7 +150,7 @@
             <label class="px-2 text-sm" for="sex">{{ 'form.sex' | translate }}</label>
             <input
               autocomplete="off"
-              #emailInput
+              #sexInput
               id="sex"
               class="p-inputtext-lg mt-1 w-full"
               pInputText
@@ -264,7 +264,7 @@
               id="chronicDiseases"
               class="p-inputtext-lg w-full"
               pInputTextarea
-              [placeholder]="'Alzheimer\'s disease'"></textarea>
+              [placeholder]="'patient_manager.no_records' | translate"></textarea>
           </div>
         </div>
         <div class="col-12 sm:col-8">
@@ -308,7 +308,7 @@
               [showItemNavigators]="true"
               [showThumbnails]="false">
               <ng-template pTemplate="item" let-XRay>
-                                <p class="absolute bottom-100 mb-3 text-white">[ name: {{ XRayFileCollection[activeXRayIndex].file.name }} ]</p>
+                <p class="absolute bottom-100 mb-3 text-white">[ name: {{ XRayFileCollection[activeXRayIndex].file.name }} ]</p>
                 <p class="absolute top-0 left-0 my-1 mx-2 text-gray-700 font-bold text-sm">{{ activeXRayIndex + 1 }}.</p>
                 <img class="w-full max-h-85vh" [src]="displayedXRaySrc"/>
                 <i
@@ -358,8 +358,8 @@
                 </div>
               </ng-template>
             </p-galleria>
-<!--          TODO  no translation needed, this button must be removed! -->
-            <button class="p-button" (click)="savePatientXRays()">Save X-Rays</button>
+            <!--&lt;!&ndash;             TODO only for testing purposes, this button should be removed!&ndash;&gt;-->
+            <!--            <button class="p-button" (click)="savePatientXRays()">Save X-Rays</button>-->
           </div>
         </div>
         <div class="col-12">
@@ -383,7 +383,7 @@
                 <img
                   [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex].status === 'missing'"
                   (click)="displayTooth(tooth, toothIndex)"
-                  src="assets/images/tooth-molar.png">
+                  [src]="'assets/images/tooth/' + (patientToothChart[toothIndex].status === 'implant' ? 'implant_' : '') + toothNotation[toothIndex].image">
                 <span class="my-2">{{tooth.label}}</span>
               </div>
             </div>
@@ -392,7 +392,7 @@
                 <img
                   [class.missing]="patientToothChart[toothIndex] && patientToothChart[toothIndex + 16].status === 'missing'"
                   (click)="displayTooth(tooth, toothIndex + 16)"
-                  src="assets/images/tooth-molar.png">
+                  [src]="'assets/images/tooth/' + (patientToothChart[toothIndex + 16].status === 'implant' ? 'implant_' : '') + toothNotation[toothIndex].image">
                 <span class="my-2">{{tooth.label}}</span>
               </div>
             </div>
@@ -401,18 +401,30 @@
       </div>
     </div>
   </div>
-  <div class="grid grid-nogutter col-12 mt-7 justify-content-end">
-    <div class="my-1">
-      <button pRipple type="button" class="p-button-lg px-5 text-gray-800 h-full" (click)="navigateToPdfViewer()" pButton>
-        <i class="pi pi-file-pdf"></i>
-      </button>
-    </div>
-    <div class="my-1 mx-2">
+  <div class="flex justify-content-end sm:justify-content-between gap-2 p-1 xl:mb-5 xl:mt-2">
+    <button
+      pRipple
+      type="button"
+      class="p-button-lg text-gray-80 h-full w-4rem lg:w-5rem flex justify-content-center cancel"
+      (click)="resetPatient()"
+      pButton>
+      <i class="pi pi-refresh text-3xl"></i>
+    </button>
+    <div class="flex gap-2">
       <button
         pRipple
         type="button"
-        class="p-button-lg px-5 text-gray-800"
-        [disabled]="patientFormGroup.invalid"
+        class="p-button-lg text-gray-80 h-full w-4rem lg:w-5rem flex justify-content-center cancel"
+        (click)="displayDocumentBuilderDialog()"
+        pButton
+        [disabled]="!patientFormGroup.valid">
+        <i class="pi pi-receipt text-3xl"></i>
+      </button>
+      <button
+        pRipple
+        type="button"
+        class="p-button-lg px-5 h-full text-gray-800 line-height-3"
+        [disabled]="!patientFormGroup.valid"
         (click)="savePatient()"
         [label]="'button.save_patient' | translate"
         pButton>
@@ -425,7 +437,7 @@
           [dismissableMask]="true"
           [resizable]="false"
           [autoZIndex]="false"
-          [closeOnEscape]="true"
+          [closeOnEscape]="false"
           [showHeader]="false"
           class="tooth-dialog"
           (onHide)="destroyToothViewer()"
@@ -433,12 +445,10 @@
   <app-tooth-viewer
     class="w-full"
     (hideToothDialog)="hideTooth()"
+    (forceToothDialog)="forceToothDialog($event)"
     *ngIf="initializeToothViewer"
-    [patientId]="temporaryPatientId"
-    [toothNotation]="toothNotation"
-    [patientToothChart]="patientToothChart"
-    [patientToothData]="patientToothData"
-    [toothIndex]="toothToShowIndex">
+    [tooth]="patientToothChart[toothToShowIndex]"
+    [notation]="toothNotation[toothToShowIndex]">
   </app-tooth-viewer>
 </p-dialog>
 
@@ -480,6 +490,21 @@
       [auto]="true">
     </p-fileUpload>
   </div>
+</p-dialog>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          (onHide)="destroyDocumentBuilderDialog()"
+          [(visible)]="showDocumentBuilderDialog">
+  <app-document-builder
+    (hideDocumentBuilder)="closeDocumentBuilderDialog()"
+    *ngIf="initializeDocumentBuilder"
+    [patient]="patient">
+  </app-document-builder>
 </p-dialog>
 
 <p-toast></p-toast>

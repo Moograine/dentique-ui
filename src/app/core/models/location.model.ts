@@ -11,6 +11,11 @@ export interface CountryCodeModel {
   unicode: string;
 }
 
+export interface CountryCodeSubjectModel {
+  list: CountryCodeModel[],
+  selected: CountryCodeModel
+}
+
 export class CountryCode implements CountryCodeModel {
   code = 'RO';
   dial_code = '+40'
@@ -21,5 +26,15 @@ export class CountryCode implements CountryCodeModel {
 
   constructor(countryCodeData: Partial<CountryCodeModel> = {}) {
     Object.assign(this, countryCodeData);
+  }
+}
+
+export class CountryCodeSubject implements CountryCodeSubjectModel {
+  list: CountryCodeModel[] = [];
+  selected: CountryCodeModel = new CountryCode();
+
+  constructor(list: CountryCodeModel[] = [], selected: CountryCodeModel = new CountryCode()) {
+    this.list = list;
+    this.selected = selected;
   }
 }

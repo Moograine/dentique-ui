@@ -1,0 +1,13 @@
+.datasheet {
+  min-width: 32.5rem;
+  padding-bottom: 13vh;
+
+  p {
+    width: fit-content;
+    min-width: 3rem;
+    max-width: 17.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

@@ -1,0 +1,84 @@
+<div class="text-black-alpha-80 px-6 pt-6 pb-13vh w-max">
+  <div class="flex p-2">
+    <img height="100" src="../../../../../../assets/images/tooth_logo_blue_texture.png">
+    <div class="flex flex-column justify-content-center mt-2 font-bold text-xl">
+      <span style="font-family: 'Roboto', sans-serif;" class="text-blue-900 cursor-pointer">Moograine's</span>
+      <span style="font-family: 'Roboto', sans-serif;" class="text-blue-900 cursor-pointer text-center pr-1">Clinic</span>
+    </div>
+  </div>
+  <div class="px-5">
+    <div style="font-family: 'Nunito', sans-serif" class="flex justify-content-between my-3 line-height-2">
+      <div class="col-4 max-w-15rem py-0">
+        <p class="text-blue-700 font-bold inline m-0">{{ patient.firstName }} {{ patient.lastName }}</p>
+        <p class="text-bluegray-600 block m-0">{{ patient.town }}, {{ patient.address }}</p>
+        <p class="text-bluegray-600 static m-0">{{ convertPhoneNumber(patient.phone) }}</p>
+      </div>
+      <div class="col-4 max-w-15rem ml-1 py-0">
+        <p class="text-blue-700 font-bold m-0">Moograine's Clinic</p>
+        <p class="text-bluegray-600 m-0">{{ 'Tg. Mures, Str. Republicii, nr. 11' }}</p>
+      </div>
+    </div>
+
+    <div class="summary flex justify-content-between align-items-end bg-indigo-500 text-white-alpha-80 mx-1 px-1 pt-3 line-height-2">
+      <span>{{ 'pdf_viewer.invoice' | translate }} {{ invoiceNo }}</span>
+      <span>{{ 'pdf_viewer.amount' | translate }} {{ totalPrice | customCurrency }}</span>
+      <span>{{ 'pdf_viewer.date' | translate }} {{ today | date : 'YYYY/MM/dd' }}</span>
+    </div>
+
+    <table class="w-full spacing">
+      <thead>
+      <tr class="text-black-alpha-80 font-bold">
+        <th class="bg-bluegray-20 border- border-bluegray-500 text-left uppercase px-1">{{ 'pdf_viewer.description' | translate }}</th>
+        <th class="bg-blue-20 border- border-bluegray-500 text-center uppercase px-1">{{ 'pdf_viewer.quantity' | translate }}</th>
+        <th class="bg-bluegray-30 border- border-bluegray-500 text-right uppercase px-1">{{ 'pdf_viewer.amount' | translate }}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let invoice of summary">
+        <td *ngIf="!invoice.service.custom" class="px-1">{{ ('services_list.' + invoice.service.label) | translate }}</td>
+        <td *ngIf="invoice.service.custom" class="px-1">{{ invoice.service.label }}</td>
+        <td class="text-center">1</td>
+        <td class="text-right px-1">{{ invoice.service.price | customCurrency }}</td>
+      </tr>
+      </tbody>
+      <tr>
+        <td colspan="2"></td>
+        <td class="total flex justify-content-between bg-indigo-500 text-white-alpha-80 px-1 py-1">
+          <span class="pr-2">Total</span>
+          <span>{{ totalPrice | customCurrency }}</span>
+        </td>
+      </tr>
+    </table>
+
+    <div *ngIf="showToothIllustration || summary.length === 0" class="flex justify-content-between mt-5">
+      <div class="flex gap-2">
+        <div class="flex flex-column justify-content-center align-items-center relative tooth-chart">
+          <img height="125" src="../../../../../../assets/images/tooth_chart_top.png"/>
+          <p class="top">{{ 'pdf_viewer.top' | translate }}</p>
+          <div class="dot bg-red-700 absolute"
+               [style.top]="dot.top + '%'"
+               [style.left]="dot.left + '%'"
+               *ngFor="let dot of toothInvoiceListTop">
+          </div>
+        </div>
+        <div class="flex flex-column justify-content-center align-items-center relative tooth-chart">
+          <img height="125" src="../../../../../../assets/images/tooth_chart_bottom.png"/>
+          <p class="bottom">{{ 'pdf_viewer.bottom' | translate }}</p>
+          <div class="dot bg-red-700 absolute"
+               [style.top]="dot.top + '%'"
+               [style.left]="dot.left + '%'"
+               *ngFor="let dot of toothInvoiceListBottom">
+          </div>
+          <!--            TODO  Implement actual solution-->
+        </div>
+
+      </div>
+      <div class="pl-5 flex flex-column">
+        <p class="text-blue-700 font-bold my-1">Tooth 3.7</p>
+        <span class="text-blue-500 px-2 text-sm">- Tooth Cleaning</span>
+        <span class="text-gray-400 px-2 text-sm">- Tooth Filling</span>
+        <span class="text-red-700 px-2 text-sm">- Root Canal Treatment</span>
+      </div>
+    </div>
+  </div>
+</div>

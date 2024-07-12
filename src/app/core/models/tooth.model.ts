@@ -1,3 +1,7 @@
+import { ServiceTableItem, ServiceTableItemModel } from './services-list.model';
+
+export type Notation = 'FDI' | 'UNS';
+
 export enum ToothStatus {
   Intact = 'intact',
   Missing = 'missing',
@@ -22,11 +26,22 @@ export interface ToothNotationModel {
 }
 
 export interface PreviousCareModel {
-  treatment: string;
+  service: ServiceTableItemModel;
   description: string;
   date: Date;
   positionX: number;
   positionY: number;
+}
+
+export interface ToothInvoiceModel { // TODO rename!
+  labelFDI: string;
+  labelUNS: string;
+  top: number;
+  left: number;
+}
+
+export interface ToothMarkModel {
+  [key: string]: ToothInvoiceModel;
 }
 
 export class Tooth implements ToothModel {
@@ -44,7 +59,7 @@ export class ToothNotation implements ToothNotationModel {
 }
 
 export class PreviousCare implements PreviousCareModel {
-  treatment = '';
+  service = new ServiceTableItem();
   description = '';
   date = new Date();
   positionX = 50;
@@ -59,23 +74,3 @@ export class PreviousCare implements PreviousCareModel {
     Object.assign(this, previousCare);
   }
 }
-
-/**
- * It could be useful to make a dropdown-style treatment list, which could help in the representation of previous cares in the tooth image
- *
- * Dental treatment list:
- *
-   * Bridges
-   * Crowns
-   * Fillings
-   * Root Canal Treatment
-   * Scale and Polish
-   * Braces (Orthodontic Treatment)
-   * Wisdom Tooth Removal
-   * Dental Implants
-   * Dentures or False Teeth
-   * Broken or Knocked Out Tooth
-   * Teeth Whitening
-   * Dental Veneers
- *
- */

@@ -6,58 +6,195 @@
     "settings": "Einstellungen",
     "logout": "Abmelden"
   },
+  "header": {
+    "search": "Suche",
+    "search_name": "Suche nach Name",
+    "no_results": "Keine Ergebnisse gefunden."
+  },
   "settings": {
     "doctor_details": "Arztdetails",
     "name": "Name",
     "address": "Adresse",
     "company": "Firma",
-    "CUI": "CUI",
+    "CUI": "Steuernummer",
     "application_settings": "Anwendungseinstellungen",
     "language": "Sprache",
-    "theme": "Thema"
+    "theme": "Thema",
+    "tooth_notation": "Zahnchart Notation",
+    "currency": {
+      "eur": "Euro",
+      "usd": "US-Dollar",
+      "huf": "Forint",
+      "ron": "Rumänischer Leu",
+      "rsd": "Serbischer Dinar",
+      "uah": "Ukrainische Hrywnja",
+      "czk": "Tschechische Krone",
+      "pln": "Polnischer Złoty"
+    }
   },
   "appointments": {
     "patient": "Patient",
+    "appointment": "Termin",
     "date": "Datum",
-    "cabinet": "Kabine",
-    "treatment": "Behandlung"
+    "cabinet": "Kabinett",
+    "treatment": "Behandlung",
+    "no_appointment": "Kein Termin gefunden",
+    "conflict_dialog": {
+      "title": "Konflikt",
+      "already_registered": "Ein Patient ist bereits mit dieser Telefonnummer registriert:",
+      "no_match": "Der eingegebene Name für den Termin stimmt jedoch nicht mit dem Namen des registrierten Patienten überein:",
+      "appointment_name": "Name im Termin:",
+      "original_name": "Ursprünglicher Name:",
+      "modify": "Ändern:",
+      "tooltip": "Klicken Sie auf Termin, und der eingegebene Name im Terminformular wird durch den Namen im registrierten Patientenformular ersetzt.\nKlicken Sie auf Patient, und der Termin wird so gespeichert, wie er ist, und das Patientenformular wird im Hintergrund mit dem geänderten Namen aktualisiert."
+    },
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    }
   },
   "patient_manager": {
     "allergies": "Allergien",
+    "previous_surgeries": "Frühere Operationen",
     "chronic_diseases": "Chronische Krankheiten",
     "family_health_history": "Familiengesundheitsgeschichte",
-    "tooth_chart": "Zahnkarte",
+    "no_records": "Keine Aufzeichnungen",
+    "patient_details": {
+      "allergies": "allergien",
+      "allergy": "Allergie",
+      "previous_surgeries": "frühere operationen",
+      "operations": "Operationen",
+      "chronic_diseases": "chronische krankheiten",
+      "disease": "Krankheit",
+      "family_health_history": "familiengesundheitsgeschichte",
+      "history": "Geschichte",
+      "recorded": "Aufgezeichnet",
+      "no_records": "Keine Aufzeichnungen",
+      "add": "Hinzufügen"
+    },
+    "x_rays": {
+      "title": "Röntgenaufnahmen",
+      "upload": "Hochladen",
+      "no_x_rays": "Es wurden noch keine Röntgenaufnahmen hochgeladen"
+    },
+    "tooth_chart": "Zahnchart",
+    "tooth_status": "Zahnstatus:",
+    "intact": "Intakt",
+    "missing": "Gezogen",
+    "implant": "Implantat",
     "FDI": "FDI",
-    "UNS": "UNS",
-    "save_patient": "Patient Speichern"
+    "UNS": "UNS"
   },
   "form": {
-    "first_name": "Name",
-    "last_name": "Familienname",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
     "phone": "Telefonnummer",
-    "PIN": "CNP",
+    "PIN": "PIN",
     "birthday": "Geburtsdatum",
     "date": "Datum",
     "age": "Alter",
     "email": "E-Mail-Adresse",
     "sex": "Geschlecht",
-    "county": "Kreis",
+    "county": "Landkreis",
     "town": "Stadt",
-    "address": "Adresse"
+    "address": "Adresse",
+    "treatment": "Behandlung",
+    "description": "Beschreibung"
   },
   "notifications": {
     "appointment_created": "Termin erstellt!",
-    "appointment_deleted": "Termin gelöscht!",
+    "appointment_deleted": "Termin abgesagt!",
     "appointment_updated": "Termin aktualisiert!",
-    "saved": "Gespeichert!",
-    "error": "Etwas ist schiefgelaufen!"
+    "patient_saved": "Patient gespeichert.",
+    "patient_not_registered": "Patient nicht registriert!",
+    "patient_already_registered": "Diese Telefonnummer ist bereits diesem Patienten zugeordnet:",
+    "patient_corrupted": "Die Patientendaten sind beschädigt!",
+    "patient_invalid_form": "Bitte geben Sie zuerst die Patientendaten ein!",
+    "previous_care_deleted": "Frühere Behandlung gelöscht.",
+    "larger_than_5MB": "Darf nicht größer als 5MB sein!",
+    "acceptable_file_formats": "Nur .png oder .jpg oder .jpeg ist akzeptiert!",
+    "invalid_form": "Das Formular ist ungültig.",
+    "invalid": "Ungültig",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cannot_save": "Kann nicht gespeichert werden",
+    "not_found": "Nicht gefunden",
+    "saved": "Gespeichert.",
+    "uploaded": "Hochgeladen.",
+    "deleted": "Gelöscht.",
+    "generic_error": "Etwas ist schief gelaufen!"
   },
   "button": {
     "save": "Speichern",
     "save_patient": "Patient speichern",
     "cancel": "Abbrechen",
     "close": "Schließen",
+    "override": "Überschreiben",
     "login": "Anmelden",
-    "try_again": "Erneut versuchen"
+    "try_again": "Noch einmal versuchen"
+  },
+  "primeng": {
+    "dayNames": [
+      "Sonntag",
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag"
+    ],
+    "dayNamesShort": [
+      "So",
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa"
+    ],
+    "dayNamesMin": [
+      "So",
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa"
+    ],
+    "monthNames": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
+    "monthNamesShort": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ],
+    "today": "Heute",
+    "weekHeader": "Woche"
   }
 }

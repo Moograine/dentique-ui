@@ -14,7 +14,17 @@
     "CUI": "CUI",
     "application_settings": "Ustawienia Aplikacji",
     "language": "Język",
-    "theme": "Motyw"
+    "theme": "Motyw",
+    "currency": {
+      "eur": "Euro",
+      "usd": "Dolar amerykański",
+      "huf": "Forint",
+      "ron": "Lej rumuński",
+      "rsd": "Dinar serbski",
+      "uah": "Hrywna ukraińska",
+      "czk": "Korona czeska",
+      "pln": "Polski złoty"
+    }
   },
   "appointments": {
     "patient": "Pacjent",

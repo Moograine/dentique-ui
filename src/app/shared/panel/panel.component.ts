@@ -7,23 +7,42 @@ import { Router } from '@angular/router';
   styleUrls: ['./panel.component.scss']
 })
 export class PanelComponent {
+  menuItems = [
+    {
+      path: 'appointments',
+      icon: 'pi-calendar-clock',
+      label: 'menu.appointments'
+    },
+    {
+      path: 'patient-manager',
+      icon: 'pi-user',
+      label: 'menu.patient_manager'
+    },
+    {
+      path: 'patient-list',
+      icon: 'pi-users',
+      label: 'menu.patient_list'
+    },
+    {
+      path: 'settings',
+      icon: 'pi-cog',
+      label: 'menu.settings'
+    },
+    {
+      path: 'login',
+      icon: 'pi-sign-out',
+      label: 'menu.logout'
+    }
+  ]
 
   constructor(private router: Router) {
   }
 
-  navigateToAppointments(): void {
-    this.router.navigate((['/appointments'])).then();
-  }
-
-  navigateToPatientManager(): void {
-    this.router.navigate((['/patient-manager'])).then();
-  }
-
-  navigateToSettings(): void {
-    this.router.navigate((['/settings'])).then();
+  navigateTo(path: string): void {
+    this.router.navigate([path]).then();
   }
 
   logout(): void {
-    this.router.navigate(['/login']).then();
+    this.router.navigate(['login']).then();
   }
 }

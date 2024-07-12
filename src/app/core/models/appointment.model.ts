@@ -1,29 +1,29 @@
 import { SearchType } from './settings.model';
 
-export type ResolveConflictOptions = '' | 'cancel' | 'overrideAppointment' | 'overridePatient';
+export type ResolveConflictOptions = '' | 'overrideAppointment' | 'overridePatient';
+
+export interface ConflictDetailsModel {
+  patientFirstName: string;
+  patientLastName: string;
+}
 
 export interface AppointmentFilterModel {
   type: SearchType;
   value: string;
 }
 
-export interface AppointmentConflictDetails {
-  patientFirstName: string;
-  patientLastName: string;
-}
-
-export interface AppointmentCollectionModel {
+export interface AppointmentGroupModel {
   [key: string]: AppointmentModel[];
 }
 
-export interface AppointmentCollectionModel2 {
+export interface AppointmentCollectionModel {
   [key: string]: AppointmentModel;
 }
 
-export class AppointmentCollection2 implements AppointmentCollectionModel2 {
+export class AppointmentCollection implements AppointmentCollectionModel {
   [key: string]: AppointmentModel;
 
-  constructor(initialData: AppointmentCollectionModel2 = {}) {
+  constructor(initialData: AppointmentCollectionModel = {}) {
     Object.assign(this, initialData);
   }
 }
@@ -33,6 +33,7 @@ export interface AppointmentModel {
   lastName: string;
   phone: string;
   cabinetNumber: string;
+  doctor: string;
   date: Date;
   description: string;
   searchKeyName: string;
@@ -49,10 +50,10 @@ export class AppointmentFilter implements AppointmentFilterModel {
   }
 }
 
-export class AppointmentCollection implements AppointmentCollectionModel {
+export class AppointmentGroup implements AppointmentGroupModel {
   [key: string]: AppointmentModel[];
 
-  constructor(initialData: AppointmentCollectionModel = {}) {
+  constructor(initialData: AppointmentGroupModel = {}) {
     Object.assign(this, initialData);
   }
 }
@@ -62,6 +63,7 @@ export class Appointment implements AppointmentModel {
   lastName = '';
   phone = '';
   cabinetNumber = '';
+  doctor = '';
   date = new Date();
   description = '';
   searchKeyName = '';

@@ -1,7 +1,7 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { hamburgerAnimation } from '../../../assets/animations/animations';
-import { CountryCode, CountryCodeModel } from '../../core/models/location.model';
+import { CountryCode, CountryCodeModel, CountryCodeSubjectModel } from '../../core/models/location.model';
 import { LocationService } from '../../core/services/location.service';
 import { PatientCollectionModel, PatientModel } from '../../core/models/patient.model';
 import { PatientService } from '../../core/services/patient.service';
@@ -11,8 +11,9 @@ import { SearchOptionModel } from '../../core/models/settings.model';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { AppointmentService } from '../../core/services/appointment.service';
 import { formatDate } from '@angular/common';
-import { forkJoin } from 'rxjs';
-import { AppointmentCollectionModel2, AppointmentFilter } from '../../core/models/appointment.model';
+import { forkJoin, takeWhile } from 'rxjs';
+import { AppointmentFilter } from '../../core/models/appointment.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
@@ -24,12 +25,13 @@ import { AppointmentCollectionModel2, AppointmentFilter } from '../../core/model
   providers: [MessageService]
 })
 
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   @ViewChild('phoneInput') phoneInput?: ElementRef;
   @ViewChild('nameInput') nameInput?: ElementRef;
   @ViewChild('searchContainer') searchContainer?: ElementRef;
   @ViewChild('searchResultsWindow') searchResultsWindow?: ElementRef;
 
+  activeComponent = true;
   activePhoneMenu = false;
   countryCodes: CountryCodeModel[] = [];
   selectedCountryCode: CountryCodeModel = new CountryCode();
@@ -72,6 +74,7 @@ export class HeaderComponent implements OnInit {
   };
   searchResults: PatientCollectionModel = {};
   showSearchResults = false;
+  isFullscreen = false;
 
   constructor(private router: Router,
               private locationService: LocationService,
@@ -79,6 +82,7 @@ export class HeaderComponent implements OnInit {
               private doctorService: DoctorService,
               private patientService: PatientService,
               private appointmentService: AppointmentService,
+              private translateService: TranslateService,
               private breakpointObserver: BreakpointObserver) {
   }
 
@@ -96,8 +100,20 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  /** Function to toggle full screen of the web browser **/
+  toggleFullScreen(): void {
+    // TODO make it all browser compatible
+    this.isFullscreen = !this.isFullscreen;
+
+    if (!this.isFullscreen) {
+      document.exitFullscreen().then();
+      return;
+    }
+
+    document.documentElement.requestFullscreen().then();
+  }
+
   resetSearch(): void {
-    // TODO implement reset search
     this.showResetButton = false;
     this.showSearchResults = false;
     this.searchResults = {};
@@ -110,9 +126,11 @@ export class HeaderComponent implements OnInit {
   }
 
   initializeCountryCodes(): void {
-    this.locationService.getCountryCodes().subscribe((countryCodes: CountryCodeModel[]): void => {
-      this.countryCodes = countryCodes;
-      this.selectedCountryCode = this.locationService.selectedCountryCode;
+    this.locationService.countryCodeFetch().pipe(
+      takeWhile(() => this.activeComponent)
+    ).subscribe((subjectValue: CountryCodeSubjectModel) => {
+      this.countryCodes = subjectValue.list;
+      this.selectedCountryCode = subjectValue.selected;
     });
   }
 
@@ -151,7 +169,7 @@ export class HeaderComponent implements OnInit {
   }
 
   monitorRouter(): void {
-    this.router.events.subscribe((event) => {
+    this.router.events.pipe(takeWhile(() => this.activeComponent)).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.setCurrentRoute();
       }
@@ -159,7 +177,7 @@ export class HeaderComponent implements OnInit {
   }
 
   monitorResolution(): void {
-    this.breakpointObserver.observe('(max-width: 768px)').subscribe(result => {
+    this.breakpointObserver.observe('(max-width: 768px)').pipe(takeWhile(() => this.activeComponent)).subscribe(result => {
       this.isSmallScreen = result.matches;
     });
   }
@@ -205,12 +223,17 @@ export class HeaderComponent implements OnInit {
       }
 
       /* Search patient by phone number */
-      this.patientService.getPatientsByPhone(phone).subscribe((patients: PatientCollectionModel): void => {
+      this.patientService.getPatientsByPhone(phone).pipe(
+        takeWhile(() => this.activeComponent)
+      ).subscribe((patients: PatientCollectionModel): void => {
         this.displaySearchResultsWindow();
         this.searchResults = patients;
       }, () => {
-        // TODO translation needed
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Something Went Wrong' });
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translateService.instant('notifications.error'),
+          detail: this.translateService.instant('notifications.generic_error')
+        });
       });
     }
 
@@ -242,6 +265,7 @@ export class HeaderComponent implements OnInit {
         const firstNameSearch$ = this.patientService.getPatientsByName(name);
         const lastNameSearch$ = this.patientService.getPatientsByName(name, true);
         forkJoin([firstNameSearch$, lastNameSearch$])
+          .pipe(takeWhile(() => this.activeComponent))
           .subscribe(([firstNameResults, lastNameResults]: [PatientCollectionModel, PatientCollectionModel]) => {
             const combinedResults: PatientCollectionModel = {
               ...firstNameResults,
@@ -250,8 +274,11 @@ export class HeaderComponent implements OnInit {
             this.displaySearchResultsWindow();
             this.searchResults = combinedResults;
           }, () => {
-            // TODO translation needed
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Something Went Wrong' });
+            this.messageService.add({
+              severity: 'error',
+              summary: this.translateService.instant('notifications.error'),
+              detail: this.translateService.instant('notifications.generic_error')
+            });
           });
 
         return;
@@ -282,6 +309,7 @@ export class HeaderComponent implements OnInit {
     return !Object.keys(searchResults).length;
   }
 
+  /** Function which takes a raw phone number from the patient data and converts to a readable phone number with dial code **/
   convertPhoneNumber(phone: string): string {
     if (!phone.length) {
       return '';
@@ -315,5 +343,9 @@ export class HeaderComponent implements OnInit {
   navigateTo(path: string): void {
     this.router.navigate([path]).then();
     this.togglePhoneMenu();
+  }
+
+  ngOnDestroy() {
+    this.activeComponent = false;
   }
 }

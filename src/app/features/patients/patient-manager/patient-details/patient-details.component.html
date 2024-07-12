@@ -1,7 +1,7 @@
 <div #patientDetailsContainer *ngIf="patient[patientDetailType].length" class="w-75vw max-h-75vh sm:w-26rem overflow-auto">
-  <p class="mt-0 mb-3">{{ 'patient_manager.patient_details.recorded' | translate }} {{ 'patient_manager.patient_details.' + translations.title | translate }}:</p>
+  <p class="mt-0 mb-3">{{ 'patient_manager.patient_details.recorded' | translate }} {{ ( 'patient_manager.patient_details.' + translations.title) | translate }}:</p>
   <div class="border-top-1 border-bottom-1 border-bluegray-800 m-0 col font-bold">
-    {{ 'patient_manager.patient_details.' + translations.header | translate }}:
+    {{ ( 'patient_manager.patient_details.' + translations.header ) | translate }}:
   </div>
   <div aria-label="list-item-selector">
     <div *ngFor="let item of patient[patientDetailType]; index as index; trackBy: ngForTracker"

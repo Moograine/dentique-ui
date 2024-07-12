@@ -8,31 +8,13 @@
   </div>
   <div class="px-4 pt-8 text-white-alpha-80">
     <h3 class="typewriter">
-      {{ 'menu.welcome' | translate }}, Dr. Moograine!
+      {{ 'menu.welcome' | translate }}, Dr. Keresztes!
     </h3>
     <div class="flex flex-column gap-1">
-      <div class="hover:text-white-alpha-90 slide-in">
-        <div class="flex cursor-pointer" (click)="navigateToAppointments()">
-          <i class="pi pi-list mr-1 text-xs pt-1"></i>
-          <span class="consolas">{{ 'menu.appointments' | translate }}</span>
-        </div>
-      </div>
-      <div class="hover:text-white-alpha-90 slide-in">
-        <div class="flex cursor-pointer" (click)="navigateToPatientManager()">
-          <i class="pi pi-list mr-1 text-xs pt-1"></i>
-          <span class="consolas">{{ 'menu.patient_manager' | translate }}</span>
-        </div>
-      </div>
-      <div class="hover:text-white-alpha-90 slide-in">
-        <div class="flex cursor-pointer" (click)="navigateToSettings()">
-          <i class="pi pi-cog mr-1 text-xs pt-1"></i>
-          <span class="consolas">{{ 'menu.settings' | translate }}</span>
-        </div>
-      </div>
-      <div class="hover:text-white-alpha-90 slide-in">
-        <div class="flex cursor-pointer" (click)="logout()">
-          <i class="pi pi-sign-out mr-1 text-xs pt-1"></i>
-          <span class="consolas">{{ 'menu.logout' | translate }}</span>
+      <div *ngFor="let option of menuItems" class="hover:text-white-alpha-90 slide-in">
+        <div class="flex cursor-pointer align-items-center" (click)="navigateTo(option.path)">
+          <i [class]="option.icon" class="pi mr-1 text-sm"></i>
+          <span class="consolas">{{ option.label | translate }}</span>
         </div>
       </div>
     </div>

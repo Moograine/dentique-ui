@@ -1,0 +1,66 @@
+<div class="text-black-alpha-80 px-6 pt-6 pb-13vh w-max">
+  <div class="flex p-2">
+    <img height="100" src="../../../../../../assets/images/tooth_logo_blue_texture.png">
+    <div class="flex flex-column justify-content-center mt-2 font-bold text-xl">
+      <span style="font-family: 'Roboto', sans-serif;" class="text-blue-900 cursor-pointer">Moograine's</span>
+      <span style="font-family: 'Roboto', sans-serif;" class="text-blue-900 cursor-pointer text-center pr-1">Clinic</span>
+    </div>
+  </div>
+  <!-- TODO  MOVE STYLE TO CSS-->
+  <div class="px-5 datasheet mt-3 line-height-3">
+    <div class="flex gap-1">
+      <div class="flex flex-column">
+        <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.first_name' | translate }}</p>
+        <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ patient.firstName}}</p>
+      </div>
+      <div class="flex flex-column">
+        <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.last_name' | translate }}</p>
+        <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ patient.lastName}}</p>
+      </div>
+    </div>
+    <div class="flex gap-1">
+      <div class="flex flex-column">
+        <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.phone' | translate }}</p>
+        <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ convertPhoneNumber(patient.phone) }}</p>
+      </div>
+      <div *ngIf="patient.email?.length" class="flex flex-column">
+        <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.email' | translate }}</p>
+        <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ patient.email}}</p>
+      </div>
+    </div>
+    <div class="flex gap-1">
+      <div *ngIf="patient.town?.length" class="flex flex-column">
+        <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.town' | translate }}</p>
+        <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ patient.town}}</p>
+      </div>
+      <div *ngIf="patient.address?.length" class="flex flex-column">
+        <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.address' | translate }}</p>
+        <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ patient.address}}</p>
+      </div>
+    </div>
+    <div class="flex flex-column">
+      <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'patient_manager.allergies' | translate }}</p>
+      <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">
+        {{ patient.allergies.length ? patient.allergies.join(', ') : '-' }}
+      </p>
+    </div>
+    <div class="flex flex-column">
+      <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'patient_manager.previous_surgeries' | translate }}</p>
+      <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">
+        {{ patient.previousSurgeries.length ? patient.previousSurgeries.join(', ') : '-' }}
+      </p>
+    </div>
+    <div class="flex flex-column">
+      <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'patient_manager.family_health_history' | translate }}</p>
+      <p class="m-0 text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">
+        {{ patient.familyHealthHistory.length ? patient.familyHealthHistory.join(', ') : '-' }}
+      </p>
+    </div>
+    <div class="flex flex-column">
+      <p class="m-0 text-black-alpha-50 text-sm px-1">{{ 'form.notes' | translate }}</p>
+<!--    TODO  Replace with Notes-->
+      <p class="m-0 w-full max-w-full h-6rem text-black-alpha-90 px-3 py-2 border-round-lg bg-black-alpha-10">{{ patient.chronicDiseases }}</p>
+    </div>
+  </div>
+</div>
+

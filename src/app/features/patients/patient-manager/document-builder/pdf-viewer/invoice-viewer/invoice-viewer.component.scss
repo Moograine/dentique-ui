@@ -1,0 +1,29 @@
+@import 'src/assets/styles/custom';
+
+table {
+  border-spacing: .25rem;
+
+  th {
+    background-color: $white-silver;
+  }
+
+  tr {
+    &:nth-child(even) {
+      background-color: $white-silver;
+    }
+  }
+
+  td {
+    max-width: 20rem;
+  }
+}
+
+.dot {
+  width: .75rem;
+  height: .75rem;
+  border-radius: 50%;
+}
+
+.pb-13vh {
+  padding-bottom: 13vh;
+}

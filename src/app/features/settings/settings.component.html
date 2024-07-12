@@ -64,9 +64,31 @@
       <div>
         <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.tooth_notation' | translate }}: </p>
         <div class="w-fit">
-          <p-dropdown (onChange)="changeNotationSystem($event.value)" [options]="notationSystemOptions" [(ngModel)]="selectedNotationSystem"></p-dropdown>
+          <p-dropdown (onChange)="changeNotationSystem($event.value)" [options]="notationSystemOptions"
+                      [(ngModel)]="selectedNotationSystem"></p-dropdown>
+        </div>
+      </div>
+      <div>
+        <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.preferred_currency' | translate }}: </p>
+        <div class="w-fit">
+          <p-dropdown (onChange)="changePreferredCurrency($event.value)" [options]="currencyOptions"
+                      [(ngModel)]="selectedCurrencyOption">
+            <ng-template pTemplate="selectedItem">
+              <span>{{ selectedCurrencyOption | uppercase }} </span>
+              <span>({{ ( 'settings.currency.' + selectedCurrencyOption ) | translate }})</span>
+            </ng-template>
+            <ng-template pTemplate="item" let-currency>
+              <span>{{ currency | uppercase }} </span>
+              <span>({{ ( 'settings.currency.' + currency ) | translate }})</span>
+            </ng-template>
+          </p-dropdown>
         </div>
       </div>
     </div>
+  </div>
+  <div>
+    <h2 class="font-medium my-3 md:mt-0">{{ 'settings.dental_services' | translate }}</h2>
+    <p class="m-1 text-sm text-white-alpha-70">{{ 'settings.dental_services_description' | translate }}: </p>
+    <button pRipple (click)="navigateToServicesTable()" class="p-button w-fit">{{ 'button.services' | translate }}</button>
   </div>
 </div>

@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DetailedToothNotationModel, PreviousCareModel, ToothNotation, ToothNotationModel, ToothModel } from '../models/tooth.model';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { Environment } from '../environments/environment';
+import { DetailedToothNotationModel, Notation, ToothInvoiceModel, ToothMarkModel, ToothNotation, ToothNotationModel } from '../models/tooth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +26,12 @@ export class ToothService {
    *    4 quadrants (5, 6, 7, 8) and 5 teeth per quadrant
    *
    * See: https://en.wikipedia.org/wiki/Dental_notation
-   */
+   **/
 
-  constructor(private http: HttpClient) {
-  }
+  imagePathCollection: string[] = [
+    'molar.png', 'premolar.png', 'canine.png', 'incisor_smaller.png', 'incisor.png',
+    'implant_molar.png', 'implant_premolar.png', 'implant_canine.png', 'implant_incisor_smaller.png', 'implant_incisor.png'
+  ];
 
   notationChart = [
     { labelFDI: '1.8', labelUNS: '1', image: 'molar.png' },
@@ -69,7 +68,7 @@ export class ToothService {
     { labelFDI: '3.8', labelUNS: '17', image: 'molar.png' }
   ];
 
-  toothChartForPDF = [
+  toothChartForPDF: ToothInvoiceModel[] = [
     { labelFDI: '1.8', labelUNS: '1', top: 68.5, left: 83 },
     { labelFDI: '1.7', labelUNS: '2', top: 56.5, left: 84.25 },
     { labelFDI: '1.6', labelUNS: '3', top: 44.5, left: 82.75 },
@@ -81,8 +80,8 @@ export class ToothService {
     { labelFDI: '2.1', labelUNS: '9', top: 7.5, left: 40.25 },
     { labelFDI: '2.2', labelUNS: '10', top: 10.5, left: 29.25 },
     { labelFDI: '2.3', labelUNS: '11', top: 17.5, left: 22.5 },
-    { labelFDI: '2.4', labelUNS: '12', top: 25.5, left: 18.25 },
-    { labelFDI: '2.5', labelUNS: '13', top: 34.5, left: 13.25 },
+    { labelFDI: '2.4', labelUNS: '12', top: 21.5, left: 18.25 },
+    { labelFDI: '2.5', labelUNS: '13', top: 29.5, left: 13.25 },
     { labelFDI: '2.6', labelUNS: '14', top: 44.5, left: 9 },
     { labelFDI: '2.7', labelUNS: '15', top: 56.5, left: 8 },
     { labelFDI: '2.8', labelUNS: '16', top: 68.5, left: 9.5 },
@@ -100,9 +99,44 @@ export class ToothService {
     { labelFDI: '3.4', labelUNS: '21', top: 49.5, left: 74 },
     { labelFDI: '3.5', labelUNS: '20', top: 40.75, left: 79 },
     { labelFDI: '3.6', labelUNS: '19', top: 31.5, left: 83 },
-    { labelFDI: '3.7', labelUNS: '18', top: 19, left: 84.5 },
+    { labelFDI: '3.7', labelUNS: '18', top: 15.5, left: 84.25 },
     { labelFDI: '3.8', labelUNS: '17', top: 7, left: 83 },
   ];
+
+  toothMarks: ToothMarkModel = {
+    '1': { labelFDI: '1.8', labelUNS: '1', top: 68.5, left: 83 },
+    '2': { labelFDI: '1.7', labelUNS: '2', top: 56.5, left: 84.25 },
+    '3': { labelFDI: '1.6', labelUNS: '3', top: 44.5, left: 82.75 },
+    '4': { labelFDI: '1.5', labelUNS: '4', top: 34.5, left: 79.25 },
+    '5': { labelFDI: '1.4', labelUNS: '5', top: 25.5, left: 74 },
+    '6': { labelFDI: '1.3', labelUNS: '6', top: 17.5, left: 69.25 },
+    '7': { labelFDI: '1.2', labelUNS: '7', top: 10.5, left: 62.75 },
+    '8': { labelFDI: '1.1', labelUNS: '8', top: 7.5, left: 52 },
+    '9': { labelFDI: '2.1', labelUNS: '9', top: 7.5, left: 40.25 },
+    '10': { labelFDI: '2.2', labelUNS: '10', top: 10.5, left: 29.25 },
+    '11': { labelFDI: '2.3', labelUNS: '11', top: 17.5, left: 22.5 },
+    '12': { labelFDI: '2.4', labelUNS: '12', top: 21.5, left: 18.25 },
+    '13': { labelFDI: '2.5', labelUNS: '13', top: 29.5, left: 13.25 },
+    '14': { labelFDI: '2.6', labelUNS: '14', top: 44.5, left: 9 },
+    '15': { labelFDI: '2.7', labelUNS: '15', top: 56.5, left: 8 },
+    '16': { labelFDI: '2.8', labelUNS: '16', top: 68.5, left: 9.5 },
+    '32': { labelFDI: '4.8', labelUNS: '32', top: 7, left: 9 },
+    '31': { labelFDI: '4.7', labelUNS: '31', top: 19, left: 8 },
+    '30': { labelFDI: '4.6', labelUNS: '30', top: 31.5, left: 9 },
+    '29': { labelFDI: '4.5', labelUNS: '29', top: 40.75, left: 13.25 },
+    '28': { labelFDI: '4.4', labelUNS: '28', top: 49.5, left: 18.25 },
+    '27': { labelFDI: '4.3', labelUNS: '27', top: 57.75, left: 22.75 },
+    '26': { labelFDI: '4.2', labelUNS: '26', top: 64.5, left: 29.5 },
+    '25': { labelFDI: '4.1', labelUNS: '25', top: 68.5, left: 40 },
+    '24': { labelFDI: '3.1', labelUNS: '24', top: 68.5, left: 52 },
+    '23': { labelFDI: '3.2', labelUNS: '23', top: 64.5, left: 62.5 },
+    '22': { labelFDI: '3.3', labelUNS: '22', top: 57.75, left: 69.5 },
+    '21': { labelFDI: '3.4', labelUNS: '21', top: 49.5, left: 74 },
+    '20': { labelFDI: '3.5', labelUNS: '20', top: 40.75, left: 79 },
+    '19': { labelFDI: '3.6', labelUNS: '19', top: 31.5, left: 83 },
+    '18': { labelFDI: '3.7', labelUNS: '18', top: 15.5, left: 84.25 },
+    '17': { labelFDI: '3.8', labelUNS: '17', top: 7, left: 83 }
+  };
 
   notationChartBaby = [
     { labelFDI: '5.6', labelUNS: 'A', image: 'molar.png' },
@@ -133,27 +167,10 @@ export class ToothService {
 
   // TODO Think of a functional system for the tooth eruption and constantly changing baby teeth arrays
 
-  getToothNotation(notation: 'FDI' | 'UNS'): ToothNotationModel[] { // TODO create proper model
+  /** Returns the current notation system preferred by the user **/
+  getToothNotation(notation: Notation): ToothNotationModel[] { // TODO create proper model
     return this.notationChart.map((tooth: DetailedToothNotationModel) => {
       return new ToothNotation(tooth[`label${notation}`], tooth.image);
     });
-  }
-
-  savePatientToothChart(patientId: number, toothDataCollection: ToothModel[]): Observable<ToothModel[]> {
-    return <Observable<ToothModel[]>>this.http
-      .put(`${Environment.defaultApi}/patients/${patientId}/toothChart.json`, toothDataCollection);
-  }
-
-  saveTooth(patientId: number, toothId: number, tooth: ToothModel): Observable<ToothModel> {
-    console.log(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}.json`);
-    return <Observable<ToothModel>>this.http
-      .put(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}.json`, tooth);
-  }
-
-
-  savePreviousCare(patientId: number, toothId: number, previousCareId: number, previousCare: PreviousCareModel): Observable<PreviousCareModel> {
-    console.log(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}/previousCares/${previousCareId}.json`);
-    return <Observable<PreviousCareModel>>this.http
-      .put(`${Environment.defaultApi}/patients/${patientId}/toothChart/${toothId}/previousCares/${previousCareId}.json`, previousCare);
   }
 }

@@ -1,6 +1,5 @@
 export const Environment = {
-  defaultApi: 'https://dentique-ui-default-rtdb.europe-west1.firebasedatabase.app',
-  storageApi: 'gs://dentique-ui.appspot.com'
+  defaultAPI: 'https://dentique-ui-default-rtdb.europe-west1.firebasedatabase.app'
 };
 
 export const FirebaseConfig = {

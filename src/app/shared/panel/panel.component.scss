@@ -59,6 +59,10 @@
   &:nth-child(4) {
     animation: slide-in 2.25s forwards;
   }
+
+  &:nth-child(5) {
+    animation: slide-in 2.5s forwards;
+  }
 }
 
 :host::ng-deep {

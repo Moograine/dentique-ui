@@ -1,0 +1,20 @@
+<div class="px-3 relative text-black-alpha-70 font-bold" style="font-family: 'Courier New', sans-serif">
+  <img [src]="'assets/images/receipt/' + receiptType + '.jpg'">
+  <div *ngIf="receiptType === 'regular'">
+    <span class="absolute typewriter" style="left: 39.5%; top: 7.6%;">Moograine's Clinic</span>
+    <span class="absolute typewriter" style="left: 24.5%; top: 30.5%;">{{ patient.firstName }}</span>
+    <span class="absolute typewriter" style="left: 27.5%; top: 33.5%;">{{ patient.lastName }}</span>
+    <span class="absolute typewriter" style="left: 23.5%; top: 26.35%; letter-spacing: .505rem">{{ patient.PIN }}</span>
+    <span class="absolute typewriter" style="left: 21%; top: 88.5%;">{{ today | date : 'YYYY/MM/dd' }}</span>
+  </div>
+  <div *ngIf="receiptType === 'antibiotics'">
+    <span class="absolute typewriter" style="left: 39.5%; top: 13.45%;">Moograine's Clinic</span>
+    <span class="absolute typewriter" style="left: 24.5%; top: 23.5%;">{{ patient.firstName }}</span>
+    <span class="absolute typewriter" style="left: 29.5%; top: 26.25%;">{{ patient.lastName }}</span>
+    <span class="absolute typewriter" style="left: 11.5%; top: 34.25%; letter-spacing: .505rem">{{ patient.PIN }}</span>
+    <span class="absolute typewriter" style="left: 12.5%; top: 98.5%;">{{ today | date : 'YYYY/MM/dd' }}</span>
+  </div>
+</div>
+
+
+

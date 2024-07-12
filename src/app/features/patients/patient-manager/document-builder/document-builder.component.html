@@ -1,0 +1,150 @@
+<div style="max-width: 80vw" class="w-75vw sm:w-25rem">
+  <p class="m-1">{{ 'patient_manager.document_builder.document_type' | translate }}</p>
+  <p-dropdown [(ngModel)]="selectedDocumentType" [options]="documentTypes">
+    <ng-template pTemplate="selectedItem">
+      <i [ngClass]="selectedDocumentType.icon" class="pi text-sm pr-1"></i>
+      <span>{{ ('patient_manager.document_builder.' + selectedDocumentType.label) | translate }}</span>
+    </ng-template>
+    <ng-template pTemplate="item" let-documentType>
+      <i [ngClass]="documentType.icon" class="pi text-sm pr-1"></i>
+      <span>{{ ('patient_manager.document_builder.' + documentType.label) | translate }}</span>
+    </ng-template>
+  </p-dropdown>
+
+  <!--    For Invoice-->
+  <div *ngIf="selectedDocumentType.label === 'invoice'">
+    <p class="m-1">{{ 'patient_manager.document_builder.select_date' | translate }}</p>
+    <p-calendar class="w-full" (ngModelChange)="summarizeTreatments($event)" [(ngModel)]="invoiceDate"></p-calendar>
+    <p class="m-1 mt-3 ">{{ 'patient_manager.document_builder.previous_cares' | translate }}</p>
+    <div class="max-h-13rem overflow-y-auto p-2 border-round border-1 border-bluegray-700">
+      <div *ngIf="invoiceList.length">
+        <div class="p-2" [class.bg-white-alpha-5]="even" *ngFor="let invoice of invoiceList; even as even; index as index">
+          <div class="flex justify-content-between">
+            <div>
+              <span *ngIf="invoice.service.custom" class="word-break">{{ invoice.service.label }}</span>
+              <span *ngIf="!invoice.service.custom" class="word-break">{{ ('services_list.' + invoice.service.label) | translate }}</span>
+              <i [pTooltip]="'patient_manager.missing_available_service_tooltip' | translate"
+                 *ngIf="invoice.unregistered"
+                 #tooltip
+                 [tooltipEvent]="'focus'"
+                 [tabindex]="0"
+                 (mouseover)="showTooltip($event, tooltip)"
+                 (mouseleave)="hideTooltip($event, tooltip)"
+                 (click)="showTooltip($event, tooltip)"
+                 class="pi pi-exclamation-triangle px-1 text-orange-600 hover:text-orange-500 transition-duration-100 text-sm">
+              </i>
+            </div>
+            <div class="flex align-items-center">
+              <span class="text-white-alpha-50 line-height-0 px-2">{{ invoice.service.price | customCurrency }}</span>
+              <i
+                (click)="deleteInvoiceItem(index)"
+                class="pi pi-times text-xs text-white-alpha-80 hover:text-white transition-duration-200 cursor-pointer">
+              </i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mx-3" *ngIf="!invoiceList.length">{{ 'patient_manager.document_builder.no_records' | translate }}</p>
+    </div>
+    <div class="flex justify-content-end">
+      <button (click)="displayAddInvoiceDialog()" pRipple class="p-button p-2 my-1">
+        <i class="pi pi-plus text-sm font-bold"></i>
+      </button>
+    </div>
+  </div>
+
+  <!--    For Receipt-->
+  <div *ngIf="selectedDocumentType.label === 'receipt'">
+    <p class="m-1">{{ 'patient_manager.document_builder.receipt_type' | translate }}</p>
+    <p-dropdown
+      [options]="receiptTypes"
+      [(ngModel)]="selectedReceiptType">
+      <ng-template pTemplate="selectedItem">
+        <span>{{ ( 'patient_manager.document_builder.' + selectedReceiptType ) | translate }}</span>
+      </ng-template>
+      <ng-template pTemplate="item" let-receiptType>
+        <span>{{ ( 'patient_manager.document_builder.' + receiptType ) | translate }}</span>
+      </ng-template>
+    </p-dropdown>
+  </div>
+
+  <!--    For Patient Datasheet-->
+  <div *ngIf="selectedDocumentType.label === 'datasheet'">
+    <div class="my-3 max-h-13rem overflow-y-auto">{{ patient | json }}</div>
+  </div>
+
+  <div class="flex justify-content-end gap-2 mt-4">
+    <button pRipple type="button" (click)="closeDocumentBuilderDialog()" class="p-button cancel">{{ 'button.cancel' | translate }}</button>
+    <button pRipple
+            type="button"
+            [disabled]="!isContentValid()"
+            (click)="displayPDF()"
+            class="p-button">{{ 'button.view' | translate }}
+    </button>
+  </div>
+</div>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          [showHeader]="false"
+          class="pdf-dialog"
+          (onHide)="destroyInvoiceDialog()"
+          [(visible)]="showInvoiceDialog">
+  <app-pdf-viewer (hidePdfViewer)="closeInvoiceDialog()">
+    <app-invoice-viewer [patient]="patient" [summary]="invoiceList" [currency]="currency" *ngIf="initializeInvoiceDialog"></app-invoice-viewer>
+  </app-pdf-viewer>
+</p-dialog>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          [showHeader]="false"
+          class="pdf-dialog"
+          [(visible)]="showReceiptDialog">
+  <app-pdf-viewer [receipt]="true" (hidePdfViewer)="closeReceiptDialog()">
+    <app-receipt-viewer [patient]="patient" [receiptType]="selectedReceiptType"></app-receipt-viewer>
+  </app-pdf-viewer>
+</p-dialog>
+
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          [showHeader]="false"
+          class="pdf-dialog"
+          [(visible)]="showDatasheetDialog">
+  <app-pdf-viewer (hidePdfViewer)="closeDatasheetDialog()">
+    <app-datasheet-viewer [patient]="patient"></app-datasheet-viewer>
+  </app-pdf-viewer>
+</p-dialog>
+
+<!--TODO migrate to invoice component! -->
+<p-dialog [modal]="true"
+          [resizable]="false"
+          [autoZIndex]="false"
+          [closable]="true"
+          [closeOnEscape]="true"
+          [dismissableMask]="true"
+          [(visible)]="showAddInvoiceDialog">
+  <p class="m-1 mt-3 ">{{ 'patient_manager.document_builder.previous_cares' | translate }}</p>
+  <p-listbox [options]="availableServices" [filter]="true" (onClick)="addInvoiceItem($event.value)" styleClass="p-listbox-dialog w-70vw sm:max-w-23rem">
+    <ng-template let-service pTemplate="item">
+      <div class="flex align-items-center gap-2" >
+        <span *ngIf="service.custom">{{ service.label }}</span>
+        <span *ngIf="!service.custom">{{ ('services_list.' + service.label) | translate }}</span>
+      </div>
+    </ng-template>
+  </p-listbox>
+  <div class="flex justify-content-end mt-3">
+    <button pRipple type="button" (click)="closeAddInvoiceDialog()" class="p-button">{{ 'button.done' | translate }}</button>
+  </div>
+</p-dialog>

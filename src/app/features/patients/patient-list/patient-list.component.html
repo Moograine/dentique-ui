@@ -1,0 +1,52 @@
+<div class="flex justify-content-center align-items-center relative px-2 sm:px-0">
+  <div class="border-round-xl border-1 border-bluegray-700 p-2 md:p-3 m-3 lg:mx-4 w-full">
+    <p *ngIf="emptyPatientCollection(patientCollection)" class="mx-3">{{ 'patient_list.no_records' | translate }}</p>
+    <div class="table-container">
+      <p-table *ngIf="!emptyPatientCollection(patientCollection)" selectionMode="single" styleClass="p-datatable-striped" [value]="patientCollection | keyvalue">
+        <ng-template pTemplate="header">
+          <tr>
+            <th></th>
+            <th pSortableColumn="value.firstName">{{ 'settings.name' | translate }}</th>
+            <th pSortableColumn="value.phone">{{ 'form.phone' | translate }}</th>
+            <th pSortableColumn="value.email">{{ 'form.email' | translate }}</th>
+            <th pSortableColumn="value.address">{{ 'form.address' | translate }}</th>
+            <th pSortableColumn="value.age">{{ 'form.age' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-patient let-rowIndex="rowIndex">
+          <tr>
+            <td class="py-4">
+              <div class="flex align-items-center justify-content-center w-3rem h-3rem border-round-3xl bg-green-900">
+                <i class="pi pi-user text-xl"></i>
+              </div>
+            </td>
+            <td>
+              <span
+                (click)="navigateToPatientManager(patient.value)"
+                class="cursor-pointer text-white-alpha-80 hover:text-white transition-duration-200">
+                {{ patient.value.firstName }} {{ patient.value.lastName }}
+              </span>
+            </td>
+            <td>
+              <span>{{ convertPhoneNumber(patient.value.phone) }}</span>
+            </td>
+            <td>
+            <span>{{ patient.value.email }}</span>
+            </td>
+            <td>
+              <span>{{ patient.value.address }}</span>
+            </td>
+            <td>
+              <span class="text-green-700 font-bold">{{ patient.value.age }}</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+<div class="flex justify-content-end mx-4 mb-3">
+  <button (click)="navigateToPatientManager()" pRipple class="p-button">{{ 'button.add' | translate }}</button>
+</div>
+
+<p-toast></p-toast>

@@ -10,25 +10,47 @@ import {
   mergeMap,
   Observable, of,
   switchMap,
-  throwError,
 } from 'rxjs';
 import { Patient, PatientCollectionModel, PatientIdCollectionModel, PatientModel, PatientXRayFileModel } from '../models/patient.model';
 import { Environment } from '../environments/environment';
-import { PreviousCare, Tooth } from '../models/tooth.model';
+import { PreviousCare, PreviousCareModel, Tooth, ToothModel } from '../models/tooth.model';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { ListResult, Reference } from '@angular/fire/compat/storage/interfaces';
+import { ComponentType, ErrorLog, ErrorLogModel } from '../models/maintenance.model';
+import { MaintenanceService } from './maintenance.service';
+import { ServiceListService } from './services-list.service';
+import { ServiceTableItem, ServiceTableItemModel } from '../models/services-list.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientService {
   activePatient: BehaviorSubject<PatientModel> = new BehaviorSubject<PatientModel>(new Patient());
+  patientCollectionSubject: BehaviorSubject<PatientCollectionModel> = new BehaviorSubject<PatientCollectionModel>({});
 
-  constructor(private http: HttpClient, private storage: AngularFireStorage) {
+  constructor(private http: HttpClient,
+              private storage: AngularFireStorage,
+              private servicesListService: ServiceListService,
+              private maintenanceService: MaintenanceService) {
   }
 
   setActivePatient(patient: PatientModel): void {
     this.activePatient.next(patient);
+  }
+
+  /** Function to populate patientCollectionSubject **/
+  populatePatientCollection(patientCollection: PatientCollectionModel): void {
+    this.patientCollectionSubject.next(patientCollection);
+  }
+
+  /** Function which returns an Observable based on the patientCollectionSubject */
+  patientCollectionFetch(): Observable<PatientCollectionModel> {
+    return <Observable<PatientCollectionModel>>this.patientCollectionSubject.pipe(
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while listening to the patientCollectionSubject changes', error, ComponentType.patientService, '50');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
   }
 
   /** Returns the database-ready format of the patient's phone number, which is used as patientId */
@@ -59,101 +81,163 @@ export class PatientService {
   }
 
   getPatientIdList(): Observable<PatientIdCollectionModel> {
-    return this.http.get<PatientIdCollectionModel>(`${Environment.defaultApi}/patients2.json?shallow=true`);
-  }
-
-  getPatients(): Observable<PatientModel[]> {
-    return this.http.get<PatientModel[]>(`${Environment.defaultApi}/patients.json`)
-      .pipe(
-        map((data: PatientModel[]) => data
-          .map(patient => new Patient({
-            ...patient,
-            phone: (patient?.phone?.split('-')[1] ?? patient.phone) || '',
-            toothChart: patient?.toothChart.map(tooth => new Tooth({
-              ...tooth,
-              previousCares: tooth?.previousCares?.map(previousCare => new PreviousCare(previousCare)) || []
-            }))
-          })))
-      );
-  }
-
-  getPatientById(patientId: string): Observable<PatientModel> {
-    return this.http.get<PatientModel>(`${Environment.defaultApi}/patients2/${patientId}.json`).pipe(
-      map(patient => new Patient({
-        ...patient,
-        toothChart: patient?.toothChart?.map(tooth => new Tooth({
-          ...tooth,
-          previousCares: tooth?.previousCares?.map(previousCare => new PreviousCare(previousCare)) || []
-        })) || []
-      }))
+    return <Observable<PatientIdCollectionModel>>this.http.get<PatientIdCollectionModel>(
+      `${Environment.defaultAPI}/patients.json?shallow=true`
+    ).pipe(
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while fetching the list of patient IDs.', error, ComponentType.patientService, '68');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
     );
   }
 
+  getPatientById(patientId: string): Observable<PatientModel> {
+    return <Observable<PatientModel>>this.http.get<PatientModel>(`${Environment.defaultAPI}/patients/${patientId}.json`).pipe(
+      map(patient => this.mapPatient(patient)),
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while fetching patient by ID.', error, ComponentType.patientService, '84');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
+  }
+
+  mapPatientCollection(response: PatientCollectionModel): PatientCollectionModel {
+    const patientCollection: PatientCollectionModel = {};
+    for (const key in response) {
+      if (response.hasOwnProperty(key)) {
+        const patient = response[key];
+        patientCollection[key] = this.mapPatient(patient);
+      }
+    }
+    return patientCollection;
+  }
+
+  mapPatient(patient: PatientModel): Patient {
+    return new Patient({
+      ...patient,
+      birthdate: this.convertDate(patient.birthdate, 'fetch'),
+      toothChart: patient.toothChart?.map(tooth => new Tooth({
+        ...tooth,
+        previousCares: tooth?.previousCares?.map(previousCare => new PreviousCare({
+          ...previousCare,
+          service: new ServiceTableItem(
+            previousCare?.service.id,
+            previousCare?.service.label,
+            undefined,
+            previousCare?.service.price,
+            previousCare?.service.custom
+          ),
+          date: this.convertDate(previousCare?.date, 'fetch')
+        })) || []
+      })) || []
+    });
+  }
+
+  /** See description in appointment.service.ts */
+  convertDate(date: Date, operation: 'fetch' | 'save'): Date {
+    if (operation === 'fetch') {
+      return new Date(new Date(date).getTime() + (new Date().getTimezoneOffset() * 60000));
+    }
+
+    return new Date(new Date(date).getTime() - (new Date().getTimezoneOffset() * 60000));
+  }
+
   getPatientsByPhone(phone: string): Observable<PatientCollectionModel> {
-    return this.http.get<PatientCollectionModel>(
-      `${Environment.defaultApi}/patients2.json?orderBy="phone"&startAt="${phone}"&endAt="${phone}\uf8ff"`)
-      .pipe(
-        map(response => {
-          const patientCollection: PatientCollectionModel = {};
-          for (const key in response) {
-            if (response.hasOwnProperty(key)) {
-              const patient = response[key];
-              patientCollection[key] = new Patient({
-                ...patient,
-                toothChart: patient.toothChart?.map(tooth => new Tooth({
-                  ...tooth,
-                  previousCares: tooth?.previousCares?.map(previousCare => new PreviousCare(previousCare)) || []
-                })) || []
-              });
-            }
-          }
-          return patientCollection;
-        })
-      );
+    return <Observable<PatientCollectionModel>>this.http.get<PatientCollectionModel>(
+      `${Environment.defaultAPI}/patients.json?orderBy="phone"&startAt="${phone}"&endAt="${phone}\uf8ff"`
+    ).pipe(
+      map((patientCollection: PatientCollectionModel) => this.mapPatientCollection(patientCollection)),
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while fetching patient by phone.', error, ComponentType.patientService, '113');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
   }
 
   getPatientsByName(name: string, reversed: boolean = false): Observable<PatientCollectionModel> {
     const queryAttribute = 'searchKeyName' + (reversed ? 'Reversed' : '');
-    return this.http.get<PatientCollectionModel>(
-      `${Environment.defaultApi}/patients2.json?orderBy="${queryAttribute}"&startAt="${name}"&endAt="${name}\uf8ff"`)
-      .pipe(
-        map(response => {
-          const patientCollection: PatientCollectionModel = {};
-          for (const key in response) {
-            if (response.hasOwnProperty(key)) {
-              const patient = response[key];
-              patientCollection[key] = new Patient({
-                ...patient,
-                toothChart: patient.toothChart?.map(tooth => new Tooth({
-                  ...tooth,
-                  previousCares: tooth?.previousCares?.map(previousCare => new PreviousCare(previousCare)) || []
-                })) || []
-              });
-            }
-          }
-          return patientCollection;
-        })
-      );
+    return <Observable<PatientCollectionModel>>this.http.get<PatientCollectionModel>(
+      `${Environment.defaultAPI}/patients.json?orderBy="${queryAttribute}"&startAt="${name}"&endAt="${name}\uf8ff"`
+    ).pipe(
+      map((patientCollection: PatientCollectionModel) => this.mapPatientCollection(patientCollection)),
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while fetching patient by name.', error, ComponentType.patientService, '126');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
   }
 
+  /** Function to prepare patient data to be saved in the database **/
+  processPatient(processedPatient: PatientModel): void {
+    processedPatient.birthdate = this.convertDate(processedPatient.birthdate, 'save');
+    processedPatient.toothChart?.forEach((tooth: ToothModel): void => {
+      tooth.previousCares.forEach((previousCare: PreviousCareModel): void => {
+        previousCare.service = new ServiceTableItem(
+          previousCare.service.id,
+          previousCare.service.label,
+          undefined,
+          previousCare.service.price,
+          previousCare.service.custom
+        );
+        previousCare.date = this.convertDate(previousCare.date, 'save');
+      });
+    });
+  }
+
+  /**
+   * Function to save patient information to the database
+   *
+   * @param {PatientModel} patient - The patient data to be saved.
+   * @param {string} patientId - The unique identifier of the patient to be updated.
+   * @returns {Observable<PatientModel>} - An observable that emits the updated `PatientModel`.
+   */
   savePatient(patient: PatientModel, patientId: string): Observable<PatientModel> {
-    return <Observable<PatientModel>>this.http.put(`${Environment.defaultApi}/patients2/${patientId}.json`, patient);
+    const processedPatient = new Patient(patient);
+    this.processPatient(processedPatient);
+
+    return <Observable<PatientModel>>this.http.put<PatientModel>(`${Environment.defaultAPI}/patients/${patientId}.json`, processedPatient).pipe(
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while saving patient.', error, ComponentType.patientService, '135');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
+  }
+
+  deletePatient(patientId: string): Observable<PatientModel> {
+    return <Observable<PatientModel>>this.http.delete<PatientModel>(`${Environment.defaultAPI}/patients/${patientId}.json`).pipe(
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while deleting patient.', error, ComponentType.patientService, '155');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
   }
 
   getPatientXRaysById(patientId: string): Observable<string[]> {
-    return this.storage.ref(patientId).listAll().pipe(
+    return <Observable<string[]>>this.storage.ref(patientId).listAll().pipe(
       switchMap(list => {
         const observables = list.items.map(item => {
           return item.getDownloadURL();
         });
-        return forkJoin(observables).pipe(
-          catchError(error => {
-            return throwError(error);
+        return <Observable<string[]>>forkJoin(observables).pipe(
+          catchError((error): Observable<ErrorLogModel> => {
+            const errorLog = new ErrorLog(
+              'Error while processing forkJoin operation of listing all items based on storage reference for X-Ray fetch.',
+              error,
+              ComponentType.patientService,
+              '173'
+            );
+            return this.maintenanceService.sendErrorLog(errorLog);
           })
         );
       }),
-      catchError(error => {
-        return throwError(error);
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog(
+          'Error while fetching the patient X-Rays by patient ID.',
+          error,
+          ComponentType.patientService,
+          '184'
+        );
+        return this.maintenanceService.sendErrorLog(errorLog);
       })
     );
   }
@@ -165,15 +249,30 @@ export class PatientService {
       const uploadTask = this.storage.upload(filePath, file);
       return uploadTask.snapshotChanges().pipe(
         last(),
-        switchMap(() => this.storage.ref(filePath).getDownloadURL())
+        switchMap(() => this.storage.ref(filePath).getDownloadURL().pipe(
+          catchError((error): Observable<ErrorLogModel> => {
+            const errorLog = new ErrorLog(
+              'Error while fetching downloadURLs for storage reference while uploading X-Rays.',
+              error,
+              ComponentType.patientService,
+              '204'
+            );
+            return this.maintenanceService.sendErrorLog(errorLog);
+          })
+        ))
       );
     });
-    return forkJoin(uploadTasks);
+    return <Observable<string[]>>forkJoin(uploadTasks).pipe(
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while uploading patient X-Rays.', error, ComponentType.patientService, '213');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
+    );
   }
 
   deletePatientXRays(patientId: string): Observable<void> {
     const folderRef = this.storage.ref(patientId);
-    return folderRef.listAll().pipe(
+    return <Observable<void>>folderRef.listAll().pipe(
       mergeMap((list: ListResult) => {
         const deletionPromises = list.items.map((fileRef: Reference) => {
           return fileRef.delete().then(() => fileRef.name);
@@ -181,7 +280,11 @@ export class PatientService {
         return deletionPromises.length > 0 ? from(Promise.all(deletionPromises)) : of(null);
       }),
       last(),
-      mergeMap(() => of(void 0))
+      mergeMap(() => of(void 0)),
+      catchError((error): Observable<ErrorLogModel> => {
+        const errorLog = new ErrorLog('Error while deleting Patient X-Rays.', error, ComponentType.patientService, '231');
+        return this.maintenanceService.sendErrorLog(errorLog);
+      })
     );
   }
 }

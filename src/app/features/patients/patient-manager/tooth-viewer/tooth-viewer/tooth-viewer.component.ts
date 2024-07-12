@@ -1,9 +1,34 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import { ToothService } from '../../../../../core/services/tooth.service';
-import { PreviousCare, PreviousCareModel, Tooth, ToothModel, ToothNotationModel, ToothStatus } from '../../../../../core/models/tooth.model';
+import {
+  PreviousCare,
+  PreviousCareModel,
+  Tooth,
+  ToothModel,
+  ToothNotation,
+  ToothNotationModel,
+  ToothStatus
+} from '../../../../../core/models/tooth.model';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
-import { MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Calendar } from 'primeng/calendar';
+import { TranslateService } from '@ngx-translate/core';
+import { Menu } from 'primeng/menu';
+import { ServiceListService } from '../../../../../core/services/services-list.service';
+import { filter, take, takeWhile } from 'rxjs';
+import { ServiceTableItem, ServiceTableItemModel } from '../../../../../core/models/services-list.model';
 
 @Component({
   selector: 'app-tooth-viewer',
@@ -11,32 +36,67 @@ import { Calendar } from 'primeng/calendar';
   styleUrls: ['./tooth-viewer.component.scss'],
   providers: [MessageService]
 })
-export class ToothViewerComponent implements AfterViewInit {
+export class ToothViewerComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren('previousCareLabel') previousCareLabels?: QueryList<ElementRef>;
   @ViewChild('parentContainer') previousCareParentContainer?: ElementRef;
   @ViewChild('treatmentInput') treatmentInput?: ElementRef;
   @ViewChild('dateInput') dateInput?: Calendar;
   @Output() hideToothDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Input() patientId: number = 0;
-  @Input() toothNotation: ToothNotationModel[] = [];
-  @Input() patientToothChart: ToothModel[] = []; /* Patient tooth data in the UI, with a constant number (32) of tooth objects. */
-  @Input() patientToothData: ToothModel[] = []; /* Patient tooth data directly from the API. */
-  @Input() toothIndex: number = 0;
+  @Output() forceToothDialog: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Input() notation: ToothNotationModel = new ToothNotation();
+  @Input() tooth: ToothModel = new Tooth(); /* Patient tooth data in the UI, with a constant number (32) of tooth objects. */
+  activeComponent = true;
+  availableServices: ServiceTableItemModel[] = [];
+  toothStatusOptions: MenuItem[] = [
+    {
+      label: this.translateService.instant('patient_manager.tooth_status'),
+      items: [
+        {
+          label: this.translateService.instant('patient_manager.intact'),
+          icon: 'pi pi-check',
+          command: () => this.changeToothStatus(ToothStatus.Intact)
+        },
+        {
+          label: this.translateService.instant('patient_manager.implant'),
+          icon: 'pi pi-filter-fill',
+          command: () => this.changeToothStatus(ToothStatus.Implant)
+        },
+        {
+          label: this.translateService.instant('patient_manager.missing'),
+          icon: 'pi pi-times-circle',
+          command: () => this.changeToothStatus(ToothStatus.Missing)
+        }
+      ]
+    }
+  ];
   previousCareToShow: PreviousCareModel = new PreviousCare();
-  previousCareBeforeSave: PreviousCareModel = new PreviousCare();
   previousCareToShowIndex = -1;
+  selectedAvailableService: ServiceTableItemModel = new ServiceTableItem();
   isNewPreviousCare = false;
-  cancelSave = false;
   showPreviousCareDialog = false;
+  showMissingServiceWarning = false;
+  isAvailableServiceMissing = false;
   isDragging = false;
   private lastTouchTime = 0;
   private doubleTapDelay = 300;
 
-  constructor(private toothService: ToothService, private messageService: MessageService) {
+  constructor(private toothService: ToothService,
+              private messageService: MessageService,
+              private servicesListService: ServiceListService,
+              private translateService: TranslateService) {
+  }
+
+  ngOnInit() {
+    this.initializeServices();
   }
 
   ngAfterViewInit() {
     this.displayPreviousCares();
+  }
+
+  /** Function to change status of the tooth **/
+  changeToothStatus(status: ToothStatus): void {
+    this.tooth.status = status;
   }
 
   /** Initializing previous cares, as the user opens a tooth for inspection. **/
@@ -71,7 +131,7 @@ export class ToothViewerComponent implements AfterViewInit {
         }
       ]
 
-      const previousCares = this.patientToothChart[this.toothIndex].previousCares;
+      const previousCares = this.tooth.previousCares;
 
       if (previousCares[previousCareIndex]) {
         const nativeElement = previousCareLabel.nativeElement;
@@ -87,6 +147,27 @@ export class ToothViewerComponent implements AfterViewInit {
         nativeElement.lastChild.classList.add(...labelStyles[labelStylesIndex].last.split(' '));
       }
     });
+  }
+
+  /** Function to initialize list of available services offered by this clinic **/
+  initializeServices(): void {
+    this.servicesListService.availableServiceFetch().pipe(
+      filter((availableServices: ServiceTableItemModel[]) => availableServices.length > 0), /* Ensure only non-empty values pass through */
+      take(1),
+      takeWhile(() => this.activeComponent)).subscribe((availableServices: ServiceTableItemModel[]): void => {
+      this.availableServices = this.servicesListService.cloneAvailableServices(availableServices);
+    }, () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('notifications.error'),
+        detail: this.translateService.instant('notifications.generic_error')
+      });
+    });
+  }
+
+  /** Displays menu for choosing status of the tooth **/
+  toggleStatusMenu(statusMenu: Menu, event: MouseEvent): void {
+    statusMenu.toggle(event);
   }
 
   /** Helper for function addPreviousCare(), in case the user is using a touchscreen. **/
@@ -121,31 +202,18 @@ export class ToothViewerComponent implements AfterViewInit {
       positionY = coordinatesInPercentage.positionY - 6.5 || 50; /* 6.5% is relatively the height of the label div in the screen */
     }
 
-    const previousCare: PreviousCareModel = new PreviousCare();
+    let availableService: ServiceTableItemModel = new ServiceTableItem();
+    if (this.availableServices[0]?.label?.length) {
+      availableService = this.availableServices[0];
+    }
+
+    const previousCare: PreviousCareModel = new PreviousCare({ service: availableService });
     previousCare.positionX = positionX;
     previousCare.positionY = positionY;
     this.showPreviousCareDialog = true;
-    this.patientToothChart[this.toothIndex].previousCares.push(previousCare);
-    this.previousCareToShowIndex = this.patientToothChart[this.toothIndex].previousCares.length - 1;
-    this.previousCareToShow = this.patientToothChart[this.toothIndex].previousCares[this.previousCareToShowIndex];
-
-    const toothIndexApi = this.calculateToothDataIndex();
-    console.log(toothIndexApi);
-
-    if (toothIndexApi < 0) {
-      /* There is no registered data on this tooth [ by its ID ] so we'll record it in the database, with the previous care. */
-      const tooth: ToothModel = {
-        id: this.patientToothChart[this.toothIndex].id,
-        status: ToothStatus.Intact,
-        previousCares: [previousCare]
-      }
-      this.patientToothData.push(new Tooth({ ...tooth }));
-      this.toothService.saveTooth(this.patientId, this.patientToothData.length - 1, tooth).subscribe();
-    } else {
-      /* This tooth exists in the database [ by its ID ] so we'll save the previous care directly for the already existing tooth. */
-      this.patientToothData[toothIndexApi].previousCares.push(previousCare);
-      this.savePreviousCarePosition(positionX, positionY, this.previousCareToShowIndex);
-    }
+    this.tooth.previousCares.push(previousCare);
+    this.previousCareToShowIndex = this.tooth.previousCares.length - 1;
+    this.previousCareToShow = this.tooth.previousCares[this.previousCareToShowIndex];
 
     /* Position the newly added previous care and add color */
     setTimeout(() => {
@@ -161,92 +229,48 @@ export class ToothViewerComponent implements AfterViewInit {
     }, 0);
   }
 
-  /** Returns the index of the current tooth which is displayed, on database level. **/
-  calculateToothDataIndex(): number {
-    // TODO it's possibly a good idea to optimize this or any similar calculations by SENDING the already pre-caluclated API index from the Patient-Manager
-    for (let toothIndex = 0; toothIndex < this.patientToothData.length; toothIndex++) {
-      /*
-         Please note that the tooth index system is different on UI and API side.
-         To avoid redundant data in the database, tooth data is registered in the database only if:
-            1. Tooth is missing
-            2. Tooth is replaced with implantation
-            3. Tooth had any previous cares
-         However, on the UI side, there is a constant 32 tooth items which are displayed.
-      */
-      if (this.patientToothData[toothIndex].id === this.patientToothChart[this.toothIndex].id) {
-        return toothIndex;
-      }
-    }
-
-    /* If there's no match, it means that there is no data registered for this tooth yet in the database. */
-    return -1;
-  }
-
+  /** Function to close previous care dialog **/
   closePreviousCareDialog(): void {
     this.showPreviousCareDialog = false;
   }
 
-  onDialogClose(): void {
+  /** Function to handle component behavior after closing the
+   * previous care dialog, and reset the list of available services **/
+  onPreviousCareDialogClose(): void {
     /* Avoid bug, which results in the calendar remaining open while the dialog is closed */
     this.dateInput && (this.dateInput.overlayVisible = false);
-    if (!this.cancelSave) {
-      this.savePreviousCare();
+    this.isNewPreviousCare = false;
+    this.forceToothDialog.emit(false);
+
+    /* Reset the list of available services, in case an item was added, due to a service being absent */
+    if (this.isAvailableServiceMissing) {
+      this.availableServices.pop();
+      this.showMissingServiceWarning = false;
+      this.isAvailableServiceMissing = false;
     }
-    this.cancelSave = false;
+
+    this.removeAnyInvalidPreviousCare();
   }
 
-  isPreviousCareModified(): boolean {
-    return JSON.stringify(this.previousCareBeforeSave) !== JSON.stringify(this.previousCareToShow);
+  /** Function to check whether a tooth has any invalid previous care after closing the Previous Care Dialog, and in case there is, remove it **/
+  removeAnyInvalidPreviousCare(): void {
+    if (!this.tooth.previousCares[this.previousCareToShowIndex]?.service?.label?.length) {
+      this.tooth.previousCares.splice(this.previousCareToShowIndex, 1);
+    }
   }
 
+  /** Function to remove previous care item and close the dialog **/
   deletePreviousCare(): void {
-    this.cancelSave = true;
     this.closePreviousCareDialog();
-    const toothIndexApi = this.calculateToothDataIndex();
-    this.patientToothData[toothIndexApi].previousCares.splice(this.previousCareToShowIndex, 1);
-    this.patientToothChart[this.toothIndex].previousCares = [ ...this.patientToothData[toothIndexApi].previousCares ];
-
-    if (!this.patientToothData[toothIndexApi].previousCares.length && this.patientToothData[toothIndexApi].status === ToothStatus.Intact) {
-      this.patientToothData.splice(toothIndexApi, 1);
-      this.toothService.savePatientToothChart(this.patientId, this.patientToothData).subscribe(() => {
-        // TODO translation needed
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Previous treatment deleted.' });
-      });
-      return;
-    }
-
-    const tooth: ToothModel = {
-      id: this.patientToothData[toothIndexApi].id,
-      status: this.patientToothData[toothIndexApi].status,
-      previousCares: this.patientToothData[toothIndexApi].previousCares
-    }
-    this.toothService.saveTooth(this.patientId, toothIndexApi, tooth).subscribe(() => {
-      // TODO translation needed
-      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Previous treatment deleted.' });
+    this.tooth.previousCares.splice(this.previousCareToShowIndex, 1);
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translateService.instant('notifications.success'),
+      detail: this.translateService.instant('notifications.previous_care_deleted')
     });
   }
 
-  savePreviousCare(): void {
-    if (!this.isPreviousCareModified()) {
-      this.isNewPreviousCare = false;
-      return;
-    }
-
-    /* Similar to calculateToothDataIndex() */
-    let toothIndexApi = -1;
-    for (let toothIndex = 0; toothIndex < this.patientToothData.length; toothIndex++) {
-      if (this.patientToothData[toothIndex].id === this.patientToothChart[this.toothIndex].id) {
-        toothIndexApi = toothIndex;
-        this.toothService.savePreviousCare(this.patientId, toothIndexApi, this.previousCareToShowIndex, this.previousCareToShow).subscribe(() => {
-          this.isNewPreviousCare = false;
-          // TODO translation needed
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Saved.' });
-        });
-        break;
-      }
-    }
-  }
-
+  /** Function to handle autofocusing input **/
   focusNextInput(input: HTMLInputElement | HTMLTextAreaElement | Calendar): void {
     if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
       input.focus();
@@ -256,6 +280,7 @@ export class ToothViewerComponent implements AfterViewInit {
     input.inputfieldViewChild.nativeElement.focus();
   }
 
+  /** Function to handle component behavior after dragging previous care label, and calculate new label position in container **/
   dragEndedPreviousCare(event: CdkDragEnd, previousCareIndex: number): void {
     this.isDragging = true;
     if (this.previousCareParentContainer) {
@@ -263,27 +288,93 @@ export class ToothViewerComponent implements AfterViewInit {
       const coordinatesInPercentage = this.calculateTopLeftPercentage(previousCareRect.left, previousCareRect.top, this.previousCareParentContainer);
       let positionX = coordinatesInPercentage.positionX || 50; /* Make sure they are valid percentages */
       let positionY = coordinatesInPercentage.positionY || 50; /* Make sure they are valid percentages */
-      this.savePreviousCarePosition(positionX, positionY, previousCareIndex);
+      this.tooth.previousCares[previousCareIndex].positionX = positionX;
+      this.tooth.previousCares[previousCareIndex].positionY = positionY;
     }
   }
 
-  savePreviousCarePosition(positionX: number, positionY: number, previousCareIndex: number): void {
-    this.patientToothChart[this.toothIndex].previousCares[previousCareIndex].positionX = positionX;
-    this.patientToothChart[this.toothIndex].previousCares[previousCareIndex].positionY = positionY;
-    const previousCare = { ...this.patientToothChart[this.toothIndex].previousCares[previousCareIndex] };
-    const toothIndexApi = this.calculateToothDataIndex();
-    this.toothService.savePreviousCare(this.patientId, toothIndexApi, previousCareIndex, previousCare).subscribe();
+  /** Function to assign a new service to previous care **/
+  assignServiceToPreviousCare(previousCare: PreviousCareModel, service: ServiceTableItemModel): void {
+    previousCare.service = new ServiceTableItem(
+      service.id,
+      service.label,
+      undefined,
+      service.price,
+      service.custom
+    );
   }
 
+  /** Function to change selected available service **/
+  changeSelectedAvailableService(availableService: ServiceTableItemModel): void {
+    if (!availableService) {
+      return;
+    }
+
+    if (this.isAvailableServiceMissing) {
+      this.showMissingServiceWarning = availableService === this.availableServices[this.availableServices.length - 1];
+    }
+
+    this.assignServiceToPreviousCare(this.previousCareToShow, availableService);
+  }
+
+  /** Function to process the offered service of the currently displayed previous care.
+   * There could be services which are no longer saved in the clinic's database, so, to respect the
+   * relation between the PrimeNG Dropdown [options] and [(ngModel)], it's imperative that the value of [(ngModel)]
+   * is part of the listed [options]. This function checks if the previous care's service is part of the availableServices array,
+   * which is the [options] for the Dropdown component. In case the fetched service isn't included in the [options], it will be temporarily added. **/
+  processDisplayedAvailableService(previousCare: PreviousCareModel): void {
+    this.previousCareToShow = previousCare;
+    for (let service of this.availableServices) {
+      if (service.label === previousCare.service.label) {
+        this.assignServiceToPreviousCare(previousCare, service);
+        this.selectedAvailableService = service;
+        return;
+      }
+    }
+
+    this.showMissingServiceWarning = true;
+    this.isAvailableServiceMissing = true;
+    const searchLabel = previousCare.service.custom ? previousCare.service.label :
+      this.translateService.instant('services_list.' + previousCare.service.label);
+    const missingServiceTableItem = new ServiceTableItem(
+      previousCare.service.id,
+      previousCare.service.label,
+      searchLabel,
+      previousCare.service.price,
+      previousCare.service.custom,
+      false
+    );
+    this.availableServices.push(missingServiceTableItem);
+    this.selectedAvailableService = missingServiceTableItem;
+    this.assignServiceToPreviousCare(previousCare, missingServiceTableItem);
+  }
+
+  /** Function to display previous care dialog, and assign displayed previous care. **/
   displayPreviousCareDialog(previousCareIndex: number): void {
     this.previousCareToShowIndex = previousCareIndex;
-    this.previousCareToShow = this.patientToothChart[this.toothIndex].previousCares[previousCareIndex];
-    this.previousCareBeforeSave = new PreviousCare({ ...this.previousCareToShow });
+    this.processDisplayedAvailableService(this.tooth.previousCares[previousCareIndex]);
     this.showPreviousCareDialog = !this.isDragging;
     this.isDragging = false;
   }
 
+  /** Function to emit a signal to the parent component, that this component is finished and can be destroyed **/
   closeToothDialog(): void {
     this.hideToothDialog.emit(true);
+  }
+
+  /** Function to trigger and display tooltip in the UI **/
+  showTooltip(event: Event, tooltip: HTMLElement): void {
+    event.stopPropagation();
+    tooltip.focus();
+  }
+
+  /** Function to hide tooltip **/
+  hideTooltip(event: Event, tooltip: HTMLElement): void {
+    tooltip.blur();
+  }
+
+  /** Function to set 'activeComponent' to false when the component is destroyed, to make sure every subscription is destroyed **/
+  ngOnDestroy() {
+    this.activeComponent = false;
   }
 }

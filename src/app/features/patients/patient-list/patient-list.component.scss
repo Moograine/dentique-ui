@@ -1,0 +1,9 @@
+@import 'src/assets/styles/custom';
+
+
+.table-container {
+  @media(min-width: 768px) {
+    max-height: calc(100vh - 14rem);
+    overflow-y: auto;
+  }
+}

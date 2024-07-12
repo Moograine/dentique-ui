@@ -1,24 +1,32 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Calendar } from 'primeng/calendar';
 import { LocationService } from '../../../core/services/location.service';
 import { PatientService } from '../../../core/services/patient.service';
 import { ToothService } from '../../../core/services/tooth.service';
-import { PatientModel, Patient, PatientDetails, PatientXRayFileModel, PatientXRayFile } from '../../../core/models/patient.model';
-import { Tooth, ToothModel, ToothNotationModel } from '../../../core/models/tooth.model';
+import {
+  Patient,
+  PatientCollectionModel,
+  PatientDetails,
+  PatientModel,
+  PatientXRayFile,
+  PatientXRayFileModel
+} from '../../../core/models/patient.model';
+import { Notation, Tooth, ToothModel, ToothNotationModel, ToothStatus } from '../../../core/models/tooth.model';
 import { Dropdown } from 'primeng/dropdown';
 import { Router } from '@angular/router';
-import { CountryCode, CountryCodeModel, CountyModel } from '../../../core/models/location.model';
+import { CountryCode, CountryCodeModel, CountryCodeSubjectModel, CountyModel } from '../../../core/models/location.model';
 import { nameValidators, phoneValidators } from '../../../core/validators/validator';
 import { DoctorService } from '../../../core/services/doctor.service';
 import { MessageService } from 'primeng/api';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { FileUpload } from 'primeng/fileupload';
 import { Galleria } from 'primeng/galleria';
-import { concatMap, forkJoin, Observable } from 'rxjs';
+import { concatMap, EMPTY, filter, finalize, forkJoin, Observable, switchMap, take, takeWhile } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { AppointmentService } from '../../../core/services/appointment.service';
-import { Appointment, AppointmentCollectionModel2, AppointmentModel } from '../../../core/models/appointment.model';
+import { Appointment, AppointmentCollectionModel, AppointmentModel, } from '../../../core/models/appointment.model';
+import { TranslateService } from '@ngx-translate/core';
 
 const PINValidationRegex =
   /\b[1-9]?\d{0,2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12][0-9]|3[01])(?:0[1-9]|[1-3][0-9]|4[0-6]|51|52)\d{0,4}\b/;
@@ -30,8 +38,12 @@ const PINValidationRegex =
   providers: [MessageService]
 })
 
-export class PatientManagerComponent implements OnInit {
+export class PatientManagerComponent implements OnInit, OnDestroy {
   @ViewChild('galleria') galleria?: Galleria;
+  @ViewChild('birthdateInput') birthdateInput?: Calendar;
+  @ViewChild('ageInput') ageInput?: ElementRef;
+  @ViewChild('sexInput') sexInput?: ElementRef;
+  activeComponent = true;
 
   patientFormGroup = this.formBuilder.group({
     firstName: ['', nameValidators],
@@ -47,7 +59,6 @@ export class PatientManagerComponent implements OnInit {
     address: ['']
   });
   patient: PatientModel = new Patient();
-  patientToothData: ToothModel[] = [];
   patientToothChart: ToothModel[] = [];
   counties: CountyModel[] = [];
   countryCodes: CountryCodeModel[] = [];
@@ -55,16 +66,19 @@ export class PatientManagerComponent implements OnInit {
   toothNotation: ToothNotationModel[] = [];
   toothToShowIndex = 0;
   showToothDialog = false;
+  forceShowToothDialog = false;
   showXRayGallery = false;
   showUploadXRayDialog = false;
+  showDocumentBuilderDialog = false;
   // TODO add to patient MODEL
   activeXRayIndex: number = 0;
   showPatientDetailsDialog = false;
   patientDetailsType: PatientDetails | '' = '';
   initializeToothViewer = false;
+  initializeDocumentBuilder = false
   timeoutForToothDialogAnimation?: number;
-  notationSystem: 'FDI' | 'UNS' = 'FDI'; /* Initially, we'll use the FDI system, because this is the preferred one among romanian doctors. */
-  temporaryPatientId = 0;
+  timeoutForDocumentBuilderDialogAnimation?: number;
+  notationSystem: Notation = 'FDI'; /* Initially, we'll use the FDI system, because this is the preferred one among romanian doctors. */
   standaloneConfiguration = {
     standalone: true
   }
@@ -82,6 +96,7 @@ export class PatientManagerComponent implements OnInit {
               private doctorService: DoctorService,
               private messageService: MessageService,
               private appointmentService: AppointmentService,
+              private translateService: TranslateService,
               private patientService: PatientService) {
   }
 
@@ -89,17 +104,50 @@ export class PatientManagerComponent implements OnInit {
     this.initializeCountryCodes();
     this.getCounties();
     this.initializeNotationSystem();
+    this.initializeToothChart();
     this.getToothNotationChart();
-    this.getPatients();
+    this.prefetchToothImages();
     this.monitorActivePatient();
+
+    /** TODO Remove **/
+
+    this.patientService.getPatientById('0040-744871324').subscribe((patient: PatientModel) => {
+      this.patientService.setActivePatient(patient);
+    });
+
+    /** TODO Remove **/
   }
 
+  /** Key combination Ctrl + Enter to open appointment dialog */
+  @HostListener('document:keydown.control.enter', ['$event']) onCtrlEnter() {
+    /* Monitor whenever Ctrl + Enter was pressed */
+    if (!this.patientFormGroup.valid || this.showXRayGallery || this.showUploadXRayDialog || this.showPatientDetailsDialog || this.showToothDialog) {
+      /* Avoid action if form is invalid or any dialog is active */
+      return;
+    }
+
+    this.savePatient();
+  }
+
+  /** Key Esc to close tooth dialog */
+  @HostListener('document:keydown.esc', ['$event']) onEsc() {
+    /* Monitor whenever Esc was pressed */
+    if (!this.showToothDialog) {
+      return;
+    }
+
+    if (!this.forceShowToothDialog) {
+      this.showToothDialog = false;
+    }
+  }
 
   initializeCountryCodes(): void {
-    this.locationService.getCountryCodes().subscribe((countryCodes: CountryCodeModel[]): void => {
-      this.countryCodes = countryCodes;
-      this.selectedCountryCode = this.locationService.selectedCountryCode;
-    })
+    this.locationService.countryCodeFetch().pipe(
+      takeWhile(() => this.activeComponent)
+    ).subscribe((subjectValue: CountryCodeSubjectModel) => {
+      this.countryCodes = subjectValue.list;
+      this.selectedCountryCode = subjectValue.selected;
+    });
   }
 
   getCounties(): void {
@@ -108,30 +156,31 @@ export class PatientManagerComponent implements OnInit {
     });
   }
 
+  /** Function to initialize the notation system based on the doctor's settings **/
   initializeNotationSystem(): void {
-    this.notationSystem = this.doctorService.notationSystem;
+    this.doctorService.notationSystemFetch().pipe(
+      filter((notationSystem: Notation) => notationSystem.length > 0), /* Ensure only non-empty values pass through */
+      take(2), /* First emitted value is the default value, which in this case is a non-empty string, so filter wil let it pass */
+      takeWhile(() => this.activeComponent)
+    ).subscribe((notation: Notation) => {
+      this.notationSystem = notation;
+    });
   }
 
   getToothNotationChart(): void {
     this.toothNotation = this.toothService.getToothNotation(this.notationSystem);
   }
 
-  changeNotationSystem(notationSystem: 'FDI' | 'UNS'): void {
+  changeNotationSystem(notationSystem: Notation): void {
     this.notationSystem = notationSystem;
     this.getToothNotationChart();
   }
 
-  getPatients(): void {
-    // TODO remove, then remove from ngOnInit
-    this.patientService.getPatients().subscribe((patients: PatientModel[]): void => {
-      const patient = patients[this.temporaryPatientId];
-      this.loadPatientToothData(patient);
-    })
-  }
-
   monitorActivePatient(): void {
-    this.patientService.activePatient.subscribe((patient: PatientModel): void => {
-      if (patient.phone?.length) {
+    this.patientService.activePatient.pipe(
+      takeWhile(() => this.activeComponent)
+    ).subscribe((patient: PatientModel): void => {
+      if (patient.phone.length) {
         this.initializePatient(patient);
       }
     })
@@ -140,17 +189,21 @@ export class PatientManagerComponent implements OnInit {
   initializePatient(patient: PatientModel): void {
     /* Double check before initializing the patient data */
     if (!patient.phone.includes('-')) {
-      // TODO translation needed
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'This patient data is corrupted!' });
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('notifications.error'),
+        detail: this.translateService.instant('notifications.patient_corrupted')
+      });
       return;
     }
 
     /* Retrieve patient data from patient service */
     this.patient = patient;
+    this.loadPatientToothData(patient);
 
     /* Get patient X-Rays */
     const patientId = this.patient.phone;
-    this.getPatientXRays(patientId);
+    this.getPatientXRays(patientId); // TODO restore
     /* Populate phone input and automatically select country dial code */
     const phoneWithCode = this.patient.phone?.split('-');
     this.selectDialCode(phoneWithCode[0]);
@@ -169,8 +222,6 @@ export class PatientManagerComponent implements OnInit {
       town: this.patient.town,
       address: this.patient.address
     });
-
-    // TODO also add toothChart data here instead of in loadPatientToothData(patientData);
   }
 
   selectDialCode(dialCode: string): void {
@@ -188,26 +239,49 @@ export class PatientManagerComponent implements OnInit {
     }
   }
 
-  loadPatientToothData(patient: PatientModel): void {
-    this.patientToothData = patient.toothChart;
-    patient.toothChart = [];
-
-    /* Initialize the patient tooth chart with 32 pieces of teeth. At first, they won't have any data, beside the UNS tooth id */
+  /** Function to populate patientToothChart with Tooth() objects **/
+  initializeToothChart(): void {
+    /* Initialize the patient tooth chart with 32 pieces of teeth. At first, they won't have any data, besides the UNS tooth id */
+    this.patientToothChart = [];
     for (let index = 1; index <= 16; index++) {
-      patient.toothChart.push(new Tooth({ id: index }));
+      this.patientToothChart.push(new Tooth({ id: index }));
     }
     for (let index = 32; index >= 17; index--) {
-      patient.toothChart.push(new Tooth({ id: index }));
+      this.patientToothChart.push(new Tooth({ id: index }));
     }
+  }
+
+  /** Function to prefetch tooth images, for smoother image loading **/
+  prefetchToothImages(): void {
+    this.toothService.imagePathCollection.forEach(path => {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = 'assets/images/tooth/' + path;
+      document.head.appendChild(link);
+    });
+  }
+
+  loadPatientToothData(patient: PatientModel): void {
+    this.initializeToothChart();
 
     /* Fill the patient tooth chart with existing data from the database. */
-    this.patientToothData.forEach(toothWithData => {
-      const matchingIndex = patient.toothChart.findIndex(toothWithoutData => toothWithoutData.id === toothWithData.id);
+    patient.toothChart.forEach(toothWithData => {
+      const matchingIndex = this.patientToothChart.findIndex(toothWithoutData => toothWithoutData.id === toothWithData.id);
       if (matchingIndex !== -1) {
-        patient.toothChart[matchingIndex] = toothWithData;
+        this.patientToothChart[matchingIndex] = toothWithData;
       }
-    })
-    this.patientToothChart = patient.toothChart;
+    });
+  }
+
+  relevantToothData(): ToothModel[] {
+    const toothData: ToothModel[] = [];
+    this.patientToothChart.forEach(tooth => {
+      if (tooth.status !== ToothStatus.Intact || tooth.previousCares?.length) {
+        toothData.push(tooth);
+      }
+    });
+
+    return toothData;
   }
 
   focusPreviousInput(inputValue: string, input: HTMLInputElement | HTMLTextAreaElement) {
@@ -236,83 +310,89 @@ export class PatientManagerComponent implements OnInit {
     input.show();
   }
 
-  calculateBirthday(inputValue: string): void {
-    /** Validate birthdate from Romanian personal identification number */
+  /** Calculates which input should be focused after pressing Enter while editing the input for the Personal Identification Number */
+  filterNextInput(currentInput: 'PIN' | 'email', nextInput: HTMLInputElement | Calendar | Dropdown): void {
+    // TODO if birthdate & age are filled, focus the emailInput
+
+    if (currentInput === 'email') {
+      if (this.patientFormGroup.value.sex?.length) {
+        this.focusNextInput(nextInput);
+        return;
+      }
+
+      if (this.sexInput) {
+        this.focusNextInput(this.sexInput.nativeElement);
+      }
+
+      return;
+    }
+
+    if (this.patientFormGroup.value.birthdate) {
+      if (this.patientFormGroup.value.age?.length) {
+        this.focusNextInput(nextInput);
+        return;
+      }
+
+      if (this.ageInput) {
+        this.focusNextInput(this.ageInput.nativeElement);
+      }
+
+      return;
+    }
+
+    if (this.birthdateInput) {
+      this.focusNextInput(this.birthdateInput);
+    }
+  }
+
+  processPIN(inputValue: string): void {
     if (PINValidationRegex.test(inputValue)) {
       // TODO validation issue, try writing 500021214 or more then delete any 0
 
       if (inputValue.length < 9) {
         // TODO remove after validation issue is fixed
-
         return;
       }
 
-      /**
-       * 1 for males born between 1900 and 1999
-       * 2 for female persons born between 1900 and 1999
-       * 3 for males born between 1800 and 1899
-       * 4 for female persons born between 1800 and 1899
-       * 5 for males born between 2000 and 2099
-       * 6 for female persons born between 2000 and 2099
-       * 7 for male residents
-       * 8 for female residents
-       */
-
-      // TODO 1: first calculate year and gender from the first character of the inputValue
-
-      // TODO 1. a.: calculate gender ! DONE !
-
-      this.patientFormGroup.controls['sex'].setValue(inputValue.charCodeAt(0) % 2 ? 'Mr.' : 'Ms.');
-
-      // TODO 1. b.: calculate year ! DONE !
-
-      let year = '';
-
-      switch (inputValue[0]) {
-        case '1' || '2':
-          year += '19' + inputValue[1] + inputValue[2];
-          break;
-        case '3' || '4':
-          year += '18' + inputValue[1] + inputValue[2];
-          break;
-        default:
-          year = '20' + inputValue[1] + inputValue[2];
-      }
-
-      // TODO 2: calculate month from inputValue.slice(3, 5) ! DONE !
-      // TODO 3: calculate day from inputValue.slice(5, 7) ! DONE !
-
-      const month = inputValue[3] + inputValue[4];
-      const day = inputValue[5] + inputValue[6];
-
-      const birthdate = new Date(`${year}-${month}-${day}`);
-      const currentDate = new Date();
-
-      /* Check if birthdate is valid and not a future date */
-
-      if (currentDate.getFullYear() - birthdate.getFullYear() < 0) {
-        return;
-      }
-
-      if (currentDate.getFullYear() - birthdate.getFullYear() === 0) {
-        const currentMonth = currentDate.getMonth();
-        const birthMonth = birthdate.getMonth();
-
-        if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDate.getDate() < birthdate.getDate())) {
-          return;
-        }
-      }
-
-      this.patientFormGroup.controls['birthdate'].setValue(new Date(birthdate));
-
-
-      this.fillAgeInput(birthdate);
+      this.fillSexInput(inputValue.charCodeAt(0) % 2 ? 'Mr.' : 'Ms.');
+      this.fillBirthdateInput(inputValue);
     }
   }
 
-  filterNextInput(input: HTMLInputElement | Calendar): void {
-    // TODO if birthdate & age are filled, focus the emailInput
-    this.focusNextInput(input);
+  fillBirthdateInput(inputValue: string): void {
+    let year = '';
+    switch (inputValue[0]) {
+      case '1' || '2':
+        year += '19' + inputValue[1] + inputValue[2];
+        break;
+      case '3' || '4':
+        year += '18' + inputValue[1] + inputValue[2];
+        break;
+      default:
+        year = '20' + inputValue[1] + inputValue[2];
+    }
+
+    const month = inputValue[3] + inputValue[4];
+    const day = inputValue[5] + inputValue[6];
+    const birthdate = new Date(`${year}-${month}-${day}`);
+    const currentDate = new Date();
+
+    /* Check if birthdate is valid and not a future date */
+    if (currentDate.getFullYear() - birthdate.getFullYear() < 0) {
+      return;
+    }
+
+    if (currentDate.getFullYear() - birthdate.getFullYear() === 0) {
+      const currentMonth = currentDate.getMonth();
+      const birthMonth = birthdate.getMonth();
+
+      if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDate.getDate() < birthdate.getDate())) {
+        return;
+      }
+    }
+
+    this.patientFormGroup.controls['birthdate'].setValue(new Date(birthdate));
+    this.fillAgeInput(birthdate);
   }
 
   fillAgeInput(birthdate: Date): void {
@@ -330,8 +410,8 @@ export class PatientManagerComponent implements OnInit {
     this.patientFormGroup.controls['age'].setValue(`${age}`);
   }
 
-  fillSexInput(): void {
-
+  fillSexInput(sex: 'Ms.' | 'Mr.'): void {
+    this.patientFormGroup.controls['sex'].setValue(sex);
   }
 
   displayPatientDetailsDialog(type: PatientDetails): void {
@@ -348,13 +428,18 @@ export class PatientManagerComponent implements OnInit {
 
 
   getPatientXRays(patientId: string): void {
+    // TODO loads even after saving patient
     this.XRayFileCollection = [];
     this.activeXRayIndex = 0;
     if (this.galleria) {
       this.galleria.activeIndex = this.activeXRayIndex;
     }
 
-    this.patientService.getPatientXRaysById(patientId).subscribe((imageURLs: string[]): void => {
+    this.patientService.getPatientXRaysById(patientId).pipe(take(1)).subscribe((imageURLs: string[]): void => {
+      if (!imageURLs?.length) {
+        return;
+      }
+
       for (let path of imageURLs) {
         /* Prefetching the URL, to load the images prematurely */
         const link = document.createElement('link');
@@ -376,7 +461,7 @@ export class PatientManagerComponent implements OnInit {
             })
           }
         }).catch(error => {
-          console.error('Error creating File object:', error);
+          console.error('Error while creating File object:', error);
         });
       }
     });
@@ -430,8 +515,13 @@ export class PatientManagerComponent implements OnInit {
       .pipe(concatMap(() => this.patientService.uploadPatientXRays(this.XRayFileCollection, patientId)))
       .subscribe(() => {
         // TODO think of a better way to indicate save
+        // TODO one method would be to use a loader animation IN case patientXRay array has a length > 0
         // TODO translation needed
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient X-Rays Uploaded.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translateService.instant('notifications.success'),
+          detail: 'Patient X-Rays Uploaded.'
+        });
       });
   }
 
@@ -512,24 +602,34 @@ export class PatientManagerComponent implements OnInit {
       { type: event.files[0].type }
     );
     if (file.size > 5000000) {
-      // TODO translation needed
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Can\'t be larger than 5MB.' });
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('notifications.error'),
+        detail: this.translateService.instant('notifications.larger_than_5MB')
+      });
       fileUploader.clear();
       return;
     }
 
     const fileType = file.type.split('/')[1];
     if (!fileType.includes('png') && !fileType.includes('jpg') && !fileType.includes('jpeg')) {
-      // TODO translation needed
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Only .png or .jpg or .jpeg is accepted!' });
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('notifications.error'),
+        detail: this.translateService.instant('notifications.accepted_file_formats')
+      });
       return;
     }
 
     const patientXRay = new PatientXRayFile(file, new Date());
     this.activeXRayIndex = this.XRayFileCollection.length;
     this.XRayFileCollection.push(patientXRay);
-    // TODO translation needed
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Uploaded.', life: 750 });
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translateService.instant('notifications.success'),
+      detail: this.translateService.instant('notifications.uploaded'),
+      life: 750
+    });
     if (this.galleria) {
       this.galleria.activeIndex = this.activeXRayIndex;
     }
@@ -555,8 +655,12 @@ export class PatientManagerComponent implements OnInit {
 
     /* Remove X-Ray object */
     this.XRayFileCollection.splice(this.activeXRayIndex, 1);
-    // TODO translation needed
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Deleted.', life: 750 });
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translateService.instant('notifications.success'),
+      detail: this.translateService.instant('notifications.deleted'),
+      life: 750
+    });
 
     /* Reorganize X-Ray collection based on dates */
     this.updateXRayCollection();
@@ -570,12 +674,11 @@ export class PatientManagerComponent implements OnInit {
     }
 
     this.XRayFileCollection.length ? this.onGalleriaItemChange(this.activeXRayIndex) : this.displayedXRaySrc = '';
-
-    // TODO bug after deleting all images, then uploading one and deeleting that as well then uploading one
   }
 
   displayTooth(tooth: ToothNotationModel, toothIndex: number): void {
-    if (this.patientToothChart[toothIndex].status === 'missing') {
+    /* Make sure previous tooth component is closed properly and destroyed before opening another one */
+    if (this.initializeToothViewer) {
       return;
     }
 
@@ -587,6 +690,11 @@ export class PatientManagerComponent implements OnInit {
     this.toothToShowIndex = toothIndex;
   }
 
+  forceToothDialog(isForced: boolean): void {
+    this.forceShowToothDialog = isForced;
+  }
+
+  /** Function to hide the tooth dialog then destroy the tooth viewer component **/
   hideTooth(): void {
     this.showToothDialog = false;
 
@@ -598,15 +706,67 @@ export class PatientManagerComponent implements OnInit {
     this.timeoutForToothDialogAnimation = window.setTimeout(() => this.initializeToothViewer = false, 250);
   }
 
-  navigateToPdfViewer(): void {
-    this.router.navigate(['pdf']).then();
+  displayDocumentBuilderDialog(): void {
+    /* Make sure previous document builder component is closed properly and destroyed before opening another one */
+    if (this.initializeDocumentBuilder) {
+      return;
+    }
+
+    this.showDocumentBuilderDialog = true;
+
+    /* Timeout is used to avoid stacking data processing while dialog animation is still in process */
+    clearTimeout(this.timeoutForDocumentBuilderDialogAnimation);
+    this.initializeDocumentBuilder = true;
+  }
+
+  closeDocumentBuilderDialog(): void {
+    this.showDocumentBuilderDialog = false;
+
+    /* Wait for p-dialog close animation */
+    this.destroyDocumentBuilderDialog();
+  }
+
+  destroyDocumentBuilderDialog(): void {
+    this.timeoutForDocumentBuilderDialogAnimation = window.setTimeout(() => this.initializeDocumentBuilder = false, 250);
+  }
+
+  resetPatient(): void {
+    const patient = new Patient();
+    this.patientService.setActivePatient(patient);
+    this.patient = patient;
+    this.patientFormGroup.reset();
+    this.initializeToothChart();
+  }
+
+  /** Returns an array of observables, which are responsible for updating the appointments based on the patient data, one by one */
+  updatableAppointments(appointmentCollection: AppointmentCollectionModel, patient: PatientModel): Observable<AppointmentModel>[] {
+    const requestCollection: Observable<AppointmentModel>[] = [];
+    Object.keys(appointmentCollection).forEach(key => {
+      const namesMatch = patient.firstName === appointmentCollection[key].firstName && patient.lastName === appointmentCollection[key].lastName;
+      const phonesMatch = patient.phone === appointmentCollection[key].phone;
+      if (namesMatch && phonesMatch) {
+        return;
+      }
+
+      appointmentCollection[key].firstName = patient.firstName;
+      appointmentCollection[key].lastName = patient.lastName;
+      appointmentCollection[key].phone = patient.phone;
+      const updatedAppointment = new Appointment({ ...appointmentCollection[key] });
+      const appointmentId = this.appointmentService.generateAppointmentId(updatedAppointment.date);
+      requestCollection.push(this.appointmentService.saveAppointment(updatedAppointment, appointmentId));
+    });
+
+    return requestCollection;
   }
 
   savePatient(): void {
     /* Double-check for existing phone number, which is needed for retrieving the folder path */
     if (!this.patientFormGroup.value.phone || !this.patientFormGroup.value.phone.length || !this.selectedCountryCode.dial_code.length) {
-      // TODO translation needed
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please enter patient details first!' });
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translateService.instant('notifications.error'),
+        detail: this.translateService.instant('notifications.patient_invalid_form')
+      });
       return;
     }
 
@@ -618,41 +778,149 @@ export class PatientManagerComponent implements OnInit {
         allergies: this.patient.allergies,
         previousSurgeries: this.patient.previousSurgeries,
         familyHealthHistory: this.patient.familyHealthHistory,
-        chronicDiseases: this.patient.chronicDiseases
+        chronicDiseases: this.patient.chronicDiseases,
+        toothChart: this.relevantToothData()
       });
-    patient.phone = this.patientService.generatePatientId(this.selectedCountryCode.dial_code, patient.phone)
-
-    // TODO when updating a patient's phone number, make sure to delete the existing node based on the previous phone number, and re-save it to a new node
-    // TODO also update all appointments on that phone numbr
 
     console.log(patient);
-    const patientId = patient.phone;
-    this.patientService.savePatient(patient, patientId).pipe(
-      concatMap(() => {
-        // TODO translation needed
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Patient Saved.' });
-        return this.appointmentService.getAppointmentsByPhone(patient.phone).pipe(
-          concatMap((appointmentCollection: AppointmentCollectionModel2) => {
-            /* Collect updated appointments into Observables and return them for processing */
-            const requestCollection: Observable<AppointmentModel>[] = [];
-            Object.keys(appointmentCollection).forEach(key => {
-              if (patient.firstName === appointmentCollection[key].firstName && patient.lastName === appointmentCollection[key].lastName) {
-                return;
-              }
+    //return;
+    patient.phone = this.patientService.generatePatientId(this.selectedCountryCode.dial_code, patient.phone);
 
-              appointmentCollection[key].firstName = patient.firstName;
-              appointmentCollection[key].lastName = patient.lastName;
-              const updatedAppointment = new Appointment({ ...appointmentCollection[key] });
-              const appointmentId = this.appointmentService.generateAppointmentId(updatedAppointment.date);
-              requestCollection.push(this.appointmentService.saveAppointment2(updatedAppointment, appointmentId));
-            });
-            return forkJoin(requestCollection);
-          })
-        )
+    /** There are 6 separate cases to handle when saving a patient. 4 cases for editing an existing patient, and 2 cases for registering a new patient:
+     * Save after editing an existing patient:
+     *  1. Phone number wasn't modified, nor the name of the patient:
+     *        - Save the patient
+     *  2. Phone number wasn't modified, but the name was modified:
+     *        - Save the patient
+     *        - Update appointments with modified name, based on patient's phone number
+     *  3. Phone number was modified, but the number is already registered to another patient
+     *        - Abort the chain of operations and notify the user
+     *  4. Phone number was modified, and it's not used by any other patient:
+     *        - Save the patient
+     *        - Update appointments with modified phone number [and name if necessary] based on patient's phone number before the modification
+     *        - Delete the patient node which was registered to the old phone number, which was currently modified
+     * Save after creating a new patient:
+     *  5. Phone number is already registered to another patient
+     *        - Abort the chain of operations and notify the user
+     *  6. Phone number is not used by any other patient:
+     *        - Save the patient
+     * */
+    let activeSubscription = true;
+    this.patientService.activePatient.pipe(
+      take(1),
+      takeWhile(() => activeSubscription),
+      switchMap((activePatient: PatientModel) => {
+        const patientId = patient.phone;
+
+        /* Check if we're editing an existing patient of registering a new one, based on whether a valid patient data is loaded in the activePatient */
+        if (activePatient.phone.length) {
+          /** Editing an existing patient */
+
+          /* Check if phone number was changed, and if it was, re-create the whole patient node in the database, and delete the old */
+          if (patient.phone === activePatient.phone) {
+
+            /* Check if the patient's name was modified */
+            if (patient.firstName === activePatient.firstName && patient.lastName === activePatient.lastName) {
+              /** 1. Phone number wasn't modified, nor the name of the patient */
+
+              /* If the registered patient's name wasn't modified, simply proceed and save the patient */
+              return this.patientService.savePatient(patient, patientId);
+            } else {
+              /** 2. Phone number wasn't modified, but the name was modified */
+
+              /* If patient's name was modified, save the patient, and update the displayed name for every appointment associated with the patient */
+              return this.patientService.savePatient(patient, patientId).pipe(
+                concatMap(() => this.appointmentService.getAppointmentsByPhone(patient.phone).pipe(
+                  concatMap((appointmentCollection: AppointmentCollectionModel) => {
+                    const requestCollection = this.updatableAppointments(appointmentCollection, patient);
+                    return forkJoin(requestCollection);
+                  })
+                ))
+              );
+            }
+          } else {
+            return this.patientService.getPatientsByPhone(patient.phone).pipe(
+              switchMap((patientCollection: PatientCollectionModel) => {
+                const keyCollection = Object.keys(patientCollection);
+                const isPhoneRegistered = keyCollection.length;
+                if (isPhoneRegistered) {
+                  /** 3. Phone number was modified, and it's already registered */
+
+                  const registeredPatientName = `${patientCollection[keyCollection[0]].firstName} ${patientCollection[keyCollection[0]].lastName}`;
+                  this.messageService.add({
+                    severity: 'info',
+                    summary: this.translateService.instant('notifications.cannot_save'),
+                    detail: `${this.translateService.instant('notifications.patient_already_registered')} ${registeredPatientName}`,
+                    life: 4000
+                  });
+
+                  return EMPTY;
+                } else {
+                  /** 4. Phone number was modified, and it's not used by any other patient */
+                    // TODO !!! make sure to migrate the X Rays as well !!!
+
+                  const oldPatientId = activePatient.phone;
+                  /* If this phone number isn't taken, save the edited patient, update every
+                  appointment based on the previous phone number, and delete the old patient node */
+                  return this.patientService.savePatient(patient, patientId).pipe(
+                    concatMap(() => this.appointmentService.getAppointmentsByPhone(oldPatientId).pipe(
+                      concatMap((appointmentCollection: AppointmentCollectionModel) => {
+                        const requestCollection = this.updatableAppointments(appointmentCollection, patient);
+                        return forkJoin(requestCollection).pipe(
+                          concatMap(() => this.patientService.deletePatient(oldPatientId))
+                        );
+                      })
+                    ))
+                  );
+                }
+              })
+            );
+          }
+        } else {
+          /** Registering a new patient */
+
+          /* Check if any other patient was already registered by this phone number */
+          return this.patientService.getPatientsByPhone(patient.phone).pipe(
+            switchMap((patientCollection: PatientCollectionModel) => {
+              const keyCollection = Object.keys(patientCollection);
+              const isPhoneRegistered = keyCollection.length;
+              if (isPhoneRegistered) {
+                /** 5. Phone number is already registered to another patient */
+
+                const registeredPatientName = `${patientCollection[keyCollection[0]].firstName} ${patientCollection[keyCollection[0]].lastName}`;
+                this.messageService.add({
+                  severity: 'info',
+                  summary: this.translateService.instant('notifications.cannot_save'),
+                  detail: `${this.translateService.instant('notifications.patient_already_registered')} ${registeredPatientName}`,
+                  life: 4000
+                });
+
+                return EMPTY;
+              } else {
+                /** 6. Phone number is not registered yet */
+
+                /* If this phone number isn't taken, simply proceed, and register the new patient */
+                return this.patientService.savePatient(patient, patientId);
+              }
+            })
+          );
+        }
       }),
-    ).subscribe(() => {}, () => {
-      // TODO translation needed
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Something went wrong.' });
+      finalize(() => {
+        activeSubscription = false
+      })
+    ).subscribe(() => {
+      /* Update the activePatient, which is used for monitoring currently loaded patient */
+      this.patientService.setActivePatient(patient);
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translateService.instant('notifications.success'),
+        detail: this.translateService.instant('notifications.patient_saved')
+      });
     });
+  }
+
+  ngOnDestroy() {
+    this.activeComponent = false;
   }
 }
